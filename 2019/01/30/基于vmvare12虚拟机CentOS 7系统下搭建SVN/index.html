@@ -3,14 +3,15 @@
 <head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="utf-8">
   
-  <title>基于vmvare12虚拟机ContOS 7系统下搭建SVN版本控制系统 | chenzhesheng的博客</title>
+  <title>基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统 | chenzhesheng的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="** 基于vmvare12虚拟机ContOS 7系统下搭建SVN版本控制系统：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;    如果你有空闲主机，放着吃尘，如果你想拥有属于自己的云存储，永久存储自己的文档，那么我建议你看看这篇文章。">
+  <meta name="description" content="** 基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;    如果你有空闲主机，放着吃尘，如果你想拥有属于自己的云存储，永久存储自己的文档，那么我建议你看看这篇文章。">
+<meta name="keywords" content="linux">
 <meta property="og:type" content="article">
-<meta property="og:title" content="基于vmvare12虚拟机ContOS 7系统下搭建SVN版本控制系统">
-<meta property="og:url" content="www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机ContOS 7系统下搭建SVN/index.html">
+<meta property="og:title" content="基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统">
+<meta property="og:url" content="www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/index.html">
 <meta property="og:site_name" content="chenzhesheng的博客">
-<meta property="og:description" content="** 基于vmvare12虚拟机ContOS 7系统下搭建SVN版本控制系统：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;    如果你有空闲主机，放着吃尘，如果你想拥有属于自己的云存储，永久存储自己的文档，那么我建议你看看这篇文章。">
+<meta property="og:description" content="** 基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;    如果你有空闲主机，放着吃尘，如果你想拥有属于自己的云存储，永久存储自己的文档，那么我建议你看看这篇文章。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://blog.zsonchen.cn/2019-01-29-16-51-24.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
 <meta property="og:image" content="http://blog.zsonchen.cn/2019-01-29-16-51-24.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
@@ -25,10 +26,10 @@
 <meta property="og:image" content="http://blog.zsonchen.cn//2019-01-30-18-55-00.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
 <meta property="og:image" content="http://blog.zsonchen.cn//2019-01-30-18-56-42.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
 <meta property="og:image" content="http://blog.zsonchen.cn/wxchat_QR.jpg">
-<meta property="og:updated_time" content="2019-04-20T09:27:57.192Z">
+<meta property="og:updated_time" content="2019-06-26T00:25:23.318Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="基于vmvare12虚拟机ContOS 7系统下搭建SVN版本控制系统">
-<meta name="twitter:description" content="** 基于vmvare12虚拟机ContOS 7系统下搭建SVN版本控制系统：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;    如果你有空闲主机，放着吃尘，如果你想拥有属于自己的云存储，永久存储自己的文档，那么我建议你看看这篇文章。">
+<meta name="twitter:title" content="基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统">
+<meta name="twitter:description" content="** 基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;    如果你有空闲主机，放着吃尘，如果你想拥有属于自己的云存储，永久存储自己的文档，那么我建议你看看这篇文章。">
 <meta name="twitter:image" content="http://blog.zsonchen.cn/2019-01-29-16-51-24.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
   
     <link rel="alternative" href="/atom.xml" title="chenzhesheng的博客" type="application/atom+xml">
@@ -239,10 +240,10 @@
         </header>                
     </div>
 </nav>
-      <div class="body-wrap"><article id="post-基于vmvare12虚拟机ContOS 7系统下搭建SVN" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-基于vmvare12虚拟机CentOS 7系统下搭建SVN" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2019/01/30/基于vmvare12虚拟机ContOS 7系统下搭建SVN/" class="article-date">
+      <a href="/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" class="article-date">
       <time datetime="2019-01-30T08:21:37.000Z" itemprop="datePublished">2019-01-30</time>
 </a>
     </div>
@@ -256,7 +257,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      基于vmvare12虚拟机ContOS 7系统下搭建SVN版本控制系统
+      基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统
     </h1>
   
 
@@ -264,8 +265,16 @@
       
       <div class="article-info article-info-post">
         
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/服务器/">服务器</a>
+    </div>
+
 
         
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+    </div>
+
         <div class="clearfix"></div>
       </div>
       
@@ -273,11 +282,11 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <p>** 基于vmvare12虚拟机ContOS 7系统下搭建SVN版本控制系统：** &lt;Excerpt in index | 首页摘要&gt;<br>    如果你有空闲主机，放着吃尘，如果你想拥有属于自己的云存储，永久存储自己的文档，那么我建议你看看这篇文章。</p>
+        <p>** 基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统：** &lt;Excerpt in index | 首页摘要&gt;<br>    如果你有空闲主机，放着吃尘，如果你想拥有属于自己的云存储，永久存储自己的文档，那么我建议你看看这篇文章。</p>
 <a id="more"></a>
 <p>&lt;The rest of contents | 余下全文&gt;</p>
-<p>虚拟机版本：vmvare 12<br>主宿机系统：Windows 7<br>虚拟机系统：ContOS 7</p>
-<h5 id="关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。"><a href="#关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。" class="headerlink" title="关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。"></a>关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。</h5><h2 id="一、安装ContOS-7系统"><a href="#一、安装ContOS-7系统" class="headerlink" title="一、安装ContOS 7系统"></a>一、安装ContOS 7系统</h2><h4 id="1-1-点击文件-新建虚拟机-典型-下一步"><a href="#1-1-点击文件-新建虚拟机-典型-下一步" class="headerlink" title="1.1 点击文件 - 新建虚拟机 - 典型 - 下一步"></a>1.1 点击文件 - 新建虚拟机 - 典型 - 下一步</h4><p><img src="http://blog.zsonchen.cn/2019-01-29-16-51-24.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30" alt></p>
+<p>虚拟机版本：vmvare 12<br>主宿机系统：Windows 7<br>虚拟机系统：CentOS 7</p>
+<h5 id="关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。"><a href="#关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。" class="headerlink" title="关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。"></a>关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。</h5><h2 id="一、安装CentOS-7系统"><a href="#一、安装CentOS-7系统" class="headerlink" title="一、安装CentOS 7系统"></a>一、安装CentOS 7系统</h2><h4 id="1-1-点击文件-新建虚拟机-典型-下一步"><a href="#1-1-点击文件-新建虚拟机-典型-下一步" class="headerlink" title="1.1 点击文件 - 新建虚拟机 - 典型 - 下一步"></a>1.1 点击文件 - 新建虚拟机 - 典型 - 下一步</h4><p><img src="http://blog.zsonchen.cn/2019-01-29-16-51-24.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30" alt></p>
 <h4 id="1-2-安装程序光盘映像文件-下一步"><a href="#1-2-安装程序光盘映像文件-下一步" class="headerlink" title="1.2 安装程序光盘映像文件 - 下一步"></a>1.2 安装程序光盘映像文件 - 下一步</h4><p><strong>提前准备好的iso系统镜像文件，底部提供网盘下载链接。</strong><br><img src="http://blog.zsonchen.cn/2019-01-29-16-51-24.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30" alt></p>
 <h4 id="1-3-填写好登陆用户名与密码-下一步"><a href="#1-3-填写好登陆用户名与密码-下一步" class="headerlink" title="1.3 填写好登陆用户名与密码 - 下一步"></a>1.3 填写好登陆用户名与密码 - 下一步</h4><p><strong>账号密码用于登陆到系统的。</strong><br><img src="http://blog.zsonchen.cn//2019-01-29-16-51-44.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30" alt></p>
 <h4 id="1-4-选择虚拟机存储位置-下一步"><a href="#1-4-选择虚拟机存储位置-下一步" class="headerlink" title="1.4 选择虚拟机存储位置 - 下一步"></a>1.4 选择虚拟机存储位置 - 下一步</h4><p><strong>机械硬盘不要存储在c盘，不然装不下。</strong><br><img src="http://blog.zsonchen.cn//2019-01-29-16-53-01.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30" alt></p>
@@ -393,13 +402,13 @@
   
     
     <div class="copyright">
-        <p><span>本文标题:</span><a href="/2019/01/30/基于vmvare12虚拟机ContOS 7系统下搭建SVN/">基于vmvare12虚拟机ContOS 7系统下搭建SVN版本控制系统</a></p>
+        <p><span>本文标题:</span><a href="/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/">基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统</a></p>
         <p><span>文章作者:</span><a href="/" title="访问 陈哲生 的个人博客">陈哲生</a></p>
         <p><span>发布时间:</span>2019年01月30日 - 16时21分</p>
-        <p><span>最后更新:</span>2019年04月20日 - 17时27分</p>
+        <p><span>最后更新:</span>2019年06月26日 - 08时25分</p>
         <p>
-            <span>原始链接:</span><a class="post-url" href="/2019/01/30/基于vmvare12虚拟机ContOS 7系统下搭建SVN/" title="基于vmvare12虚拟机ContOS 7系统下搭建SVN版本控制系统">www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机ContOS 7系统下搭建SVN/</a>
-            <span class="copy-path" data-clipboard-text="原文: www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机ContOS 7系统下搭建SVN/　　作者: 陈哲生" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <span>原始链接:</span><a class="post-url" href="/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" title="基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统">www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/</a>
+            <span class="copy-path" data-clipboard-text="原文: www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/　　作者: 陈哲生" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
             <script src="/js/clipboard.min.js"></script>
             <script> var clipboard = new Clipboard('.copy-path'); </script>
         </p>
@@ -412,9 +421,18 @@
 
 <nav id="article-nav">
   
+    <a href="/2019/01/30/基于vmvare12虚拟机ContOS 7系统下搭建SVN/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          基于vmvare12虚拟机ContOS 7系统下搭建SVN版本控制系统
+        
+      </div>
+    </a>
   
-    <a href="/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统</div>
+  
+    <a href="/2018/04/19/Dagger2注解框架在kotlin中的使用/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Dagger2注解框架在kotlin中的使用</div>
       <strong class="article-nav-caption">></strong>
     </a>
   
@@ -425,7 +443,7 @@
 
     <div id="toc" class="toc-article">
     <strong class="toc-title">文章目录</strong>
-    <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。"><span class="toc-number">1.</span> <span class="toc-text">关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一、安装ContOS-7系统"><span class="toc-number"></span> <span class="toc-text">一、安装ContOS 7系统</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-点击文件-新建虚拟机-典型-下一步"><span class="toc-number"></span> <span class="toc-text">1.1 点击文件 - 新建虚拟机 - 典型 - 下一步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-安装程序光盘映像文件-下一步"><span class="toc-number"></span> <span class="toc-text">1.2 安装程序光盘映像文件 - 下一步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3-填写好登陆用户名与密码-下一步"><span class="toc-number"></span> <span class="toc-text">1.3 填写好登陆用户名与密码 - 下一步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-选择虚拟机存储位置-下一步"><span class="toc-number"></span> <span class="toc-text">1.4 选择虚拟机存储位置 - 下一步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-5-指定存储大小"><span class="toc-number"></span> <span class="toc-text">1.5 指定存储大小</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-6-点击自定义硬件-把网络适配器更改为桥接模式"><span class="toc-number"></span> <span class="toc-text">1.6 点击自定义硬件 - 把网络适配器更改为桥接模式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、安装svn版本控制"><span class="toc-number"></span> <span class="toc-text">二、安装svn版本控制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-获取root权限"><span class="toc-number"></span> <span class="toc-text">2.1 获取root权限</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-安装svn"><span class="toc-number"></span> <span class="toc-text">2.2 安装svn</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-检验svn是否安装成功"><span class="toc-number"></span> <span class="toc-text">2.3 检验svn是否安装成功</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4-创建版本库"><span class="toc-number"></span> <span class="toc-text">2.4 创建版本库</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、修改svn配置"><span class="toc-number"></span> <span class="toc-text">三、修改svn配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-修改-passwd-文件添加用户，设置用户密码，使用自带vim-进行编辑修改"><span class="toc-number"></span> <span class="toc-text">3.1 修改 passwd 文件添加用户，设置用户密码，使用自带vim 进行编辑修改</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-修改-authz-文件对用户进行分组，以及配置用户读写权限"><span class="toc-number"></span> <span class="toc-text">3.2 修改 authz 文件对用户进行分组，以及配置用户读写权限</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-修改-svnserve-conf-文件，这是svn的具体配置文件，如果要使用到上面的-authz、-passwd，就需要修改配置该文件"><span class="toc-number"></span> <span class="toc-text">3.3 修改 svnserve.conf 文件，这是svn的具体配置文件，如果要使用到上面的 authz、 passwd，就需要修改配置该文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-4-配置完成，接下来就是开启svn的服务"><span class="toc-number"></span> <span class="toc-text">3.4 配置完成，接下来就是开启svn的服务</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、开启防火墙端口开放"><span class="toc-number"></span> <span class="toc-text">四、开启防火墙端口开放</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-常用命令"><span class="toc-number"></span> <span class="toc-text">4.1 常用命令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2-开启svn的端口"><span class="toc-number"></span> <span class="toc-text">4.2 开启svn的端口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-关于防火墙配置的其他常用命令"><span class="toc-number"></span> <span class="toc-text">4.3 关于防火墙配置的其他常用命令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#五、开机自启SVN"><span class="toc-number"></span> <span class="toc-text">五、开机自启SVN</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#5-1-在开机自动文件中添加svn服务"><span class="toc-number"></span> <span class="toc-text">5.1 在开机自动文件中添加svn服务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-2-修改权限"><span class="toc-number"></span> <span class="toc-text">5.2 修改权限</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-3-关闭selinux"><span class="toc-number"></span> <span class="toc-text">5.3 关闭selinux</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#六、通过花生壳外网访问"><span class="toc-number"></span> <span class="toc-text">六、通过花生壳外网访问</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#6-1-使用端口映射"><span class="toc-number"></span> <span class="toc-text">6.1 使用端口映射</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-2-外网访问地址"><span class="toc-number"></span> <span class="toc-text">6.2 外网访问地址</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#七、附加说明"><span class="toc-number"></span> <span class="toc-text">七、附加说明</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#7-1-更换虚拟分配的IP地址"><span class="toc-number"></span> <span class="toc-text">7.1 更换虚拟分配的IP地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-2-应用svn的pre-commit以及post-commit"><span class="toc-number"></span> <span class="toc-text">7.2 应用svn的pre-commit以及post-commit</span></a>
+    <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。"><span class="toc-number">1.</span> <span class="toc-text">关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一、安装CentOS-7系统"><span class="toc-number"></span> <span class="toc-text">一、安装CentOS 7系统</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-点击文件-新建虚拟机-典型-下一步"><span class="toc-number"></span> <span class="toc-text">1.1 点击文件 - 新建虚拟机 - 典型 - 下一步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-安装程序光盘映像文件-下一步"><span class="toc-number"></span> <span class="toc-text">1.2 安装程序光盘映像文件 - 下一步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3-填写好登陆用户名与密码-下一步"><span class="toc-number"></span> <span class="toc-text">1.3 填写好登陆用户名与密码 - 下一步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-选择虚拟机存储位置-下一步"><span class="toc-number"></span> <span class="toc-text">1.4 选择虚拟机存储位置 - 下一步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-5-指定存储大小"><span class="toc-number"></span> <span class="toc-text">1.5 指定存储大小</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-6-点击自定义硬件-把网络适配器更改为桥接模式"><span class="toc-number"></span> <span class="toc-text">1.6 点击自定义硬件 - 把网络适配器更改为桥接模式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、安装svn版本控制"><span class="toc-number"></span> <span class="toc-text">二、安装svn版本控制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-获取root权限"><span class="toc-number"></span> <span class="toc-text">2.1 获取root权限</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-安装svn"><span class="toc-number"></span> <span class="toc-text">2.2 安装svn</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-检验svn是否安装成功"><span class="toc-number"></span> <span class="toc-text">2.3 检验svn是否安装成功</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4-创建版本库"><span class="toc-number"></span> <span class="toc-text">2.4 创建版本库</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、修改svn配置"><span class="toc-number"></span> <span class="toc-text">三、修改svn配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-修改-passwd-文件添加用户，设置用户密码，使用自带vim-进行编辑修改"><span class="toc-number"></span> <span class="toc-text">3.1 修改 passwd 文件添加用户，设置用户密码，使用自带vim 进行编辑修改</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-修改-authz-文件对用户进行分组，以及配置用户读写权限"><span class="toc-number"></span> <span class="toc-text">3.2 修改 authz 文件对用户进行分组，以及配置用户读写权限</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-修改-svnserve-conf-文件，这是svn的具体配置文件，如果要使用到上面的-authz、-passwd，就需要修改配置该文件"><span class="toc-number"></span> <span class="toc-text">3.3 修改 svnserve.conf 文件，这是svn的具体配置文件，如果要使用到上面的 authz、 passwd，就需要修改配置该文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-4-配置完成，接下来就是开启svn的服务"><span class="toc-number"></span> <span class="toc-text">3.4 配置完成，接下来就是开启svn的服务</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、开启防火墙端口开放"><span class="toc-number"></span> <span class="toc-text">四、开启防火墙端口开放</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-常用命令"><span class="toc-number"></span> <span class="toc-text">4.1 常用命令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2-开启svn的端口"><span class="toc-number"></span> <span class="toc-text">4.2 开启svn的端口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-关于防火墙配置的其他常用命令"><span class="toc-number"></span> <span class="toc-text">4.3 关于防火墙配置的其他常用命令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#五、开机自启SVN"><span class="toc-number"></span> <span class="toc-text">五、开机自启SVN</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#5-1-在开机自动文件中添加svn服务"><span class="toc-number"></span> <span class="toc-text">5.1 在开机自动文件中添加svn服务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-2-修改权限"><span class="toc-number"></span> <span class="toc-text">5.2 修改权限</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-3-关闭selinux"><span class="toc-number"></span> <span class="toc-text">5.3 关闭selinux</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#六、通过花生壳外网访问"><span class="toc-number"></span> <span class="toc-text">六、通过花生壳外网访问</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#6-1-使用端口映射"><span class="toc-number"></span> <span class="toc-text">6.1 使用端口映射</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-2-外网访问地址"><span class="toc-number"></span> <span class="toc-text">6.2 外网访问地址</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#七、附加说明"><span class="toc-number"></span> <span class="toc-text">七、附加说明</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#7-1-更换虚拟分配的IP地址"><span class="toc-number"></span> <span class="toc-text">7.1 更换虚拟分配的IP地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-2-应用svn的pre-commit以及post-commit"><span class="toc-number"></span> <span class="toc-text">7.2 应用svn的pre-commit以及post-commit</span></a>
 </div>
 <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
 
@@ -491,11 +509,13 @@
 
     <div class="scroll" id="post-nav-button">
         
-            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+            <a href="/2019/01/30/基于vmvare12虚拟机ContOS 7系统下搭建SVN/" title="上一篇: 基于vmvare12虚拟机ContOS 7系统下搭建SVN版本控制系统">
+                <i class="fa fa-angle-left"></i>
+            </a>
         
         <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
         
-            <a href="/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" title="下一篇: 基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统">
+            <a href="/2018/04/19/Dagger2注解框架在kotlin中的使用/" title="下一篇: Dagger2注解框架在kotlin中的使用">
                 <i class="fa fa-angle-right"></i>
             </a>
         
