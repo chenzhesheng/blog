@@ -1,20 +1,28 @@
-
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
     
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="chenzhesheng的博客">
-    <title>基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统 - chenzhesheng的博客</title>
-    <meta name="author" content="陈哲生">
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"陈哲生","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"** 基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统：** &lt;Excerpt in index | 首页摘要&gt;    如果你有空闲主机，放着吃尘，如果你想拥有属于自己的云存储，永久存储自己的文档，那么我建议你看看这篇文章。\n\n&lt;The rest of contents | 余下全文&gt;\n虚拟机版本：vmvare 12主宿机系统：Windows 7虚拟机系统：CentOS 7\n关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。一、安装CentOS 7系统1.1 点击文件 - 新建虚拟机 - 典型 - 下一步\n1.2 安装程序光盘映像文件 - 下一步提前准备好的iso系统镜像文件，底部提供网盘下载链接。\n1.3 填写好登陆用户名与密码 - 下一步账号密码用于登陆到系统的。\n1.4 选择虚拟机存储位置 - 下一步机械硬盘不要存储在c盘，不然装不下。\n1.5 指定存储大小由于我们是用于存储文件的，有多大就用多大，不回占用硬盘的使用率，没有用到存储空间会释放出来。\n1.6 点击自定义硬件 - 把网络适配器更改为桥接模式桥接模式不用勾复制物理网络连接状态，如果此主机仅用于存储，可以把其他配置提到最优。完成，进入下一步。** 如果出现”Intel VT-x 处于禁用状态”错误，需要先进入到主机的bios界面，把 intel vt 虚拟化设置为开启状态。具体打开方式问度娘，因为厂商不同，打开方式不同。**\n二、安装svn版本控制登陆到系统后，修改系统语言、连接网络都在设置里面操作，右键桌面打开终端\n2.1 获取root权限进入到管理员角色，拥有root权限可以对很多系统文件夹进行操作。su root输入登陆密码，回车(密码是隐藏的，看不到*号照常输入就行）\n2.2 安装svnyum install -y subversion通过使用yum 可以简单轻松的安装svn。\n2.3 检验svn是否安装成功svnserve --version通过查看svn版本进行建议，打印出来不是报错信息，就说明安装成功，svnserve是svn服务的名称。\n2.4 创建版本库mkdir /home/svnsvnadmin create /home/svn/repo1这里在/home/svn目录下创建了一个名为repo1 的版本库。\n三、修改svn配置在创建完版本库后会在/svn                                                                                                                                                                          /repo1/conf 目录下生成 passwd 、authz、svnserve.conf 三个文件。\n3.1 修改 passwd 文件添加用户，设置用户密码，使用自带vim 进行编辑修改vi /home/svn/repo1/conf/passwd\n12345678910### This file is an example password file for svnserve.### Its format is similar to that of svnserve.conf. As shown in the### example below it contains one section labelled [users].### The name and password for each user follow, one account per line.[users]# harry = harryssecret# sally = sallyssecret# 添加用户名密码也比较简单，使用vi指令直接插入 [username] = [password]，例如：username = password\n\n3.2 修改 authz 文件对用户进行分组，以及配置用户读写权限vi /home/svn/repo1/conf/authz\n1234567891011121314151617181920[aliases]# 对用户进行别名操作,这个感觉一般很少用,毕竟我们在设置的用户名一般就不会太长# joe = /C=XZ/ST=Dessert/L=Snake City/O=Snake Oil, Ltd./OU=Research Institute/CN=Joe Average[groups]# 对用户进行分组操作,如果用户比较的多，并且权限不一致的情况下,可以进行分组# 组名 = 用户名,用户名....# harry_and_sally = harry,sally# harry_sally_and_joe = harry,sally,&amp;joe[/]#具体的目录 /表示当前版本库,如果当前版本库中不同的文件夹需要区分不同的权限,可以具体的配置username = rw# 设置用户或者组的具体的权限。svn对权限的控制分为r(读)以及w(写)# 用户名/组名 = 具体的权限# &amp;joe = r#[repository:/]# @harry_and_sally = rw#* = rw\n\n3.3 修改 svnserve.conf 文件，这是svn的具体配置文件，如果要使用到上面的 authz、 passwd，就需要修改配置该文件vi /home/svn/repo1/conf/authz\n123456[general]anon-access = readauth-access = writepassword-db = passwdauthz-db = authz\n\n3.4 配置完成，接下来就是开启svn的服务svnserve -d -r /home/svn/-d 指定svn在后台运行  -r 指定需要启动的版本库位置\n如果需要停止svn服务,就需要执行下面的命令进行关闭\n12ps -aux |grep svn   #查找svn的进程idkill -9 进程id  #直接关闭svn进程\n\n到这一步基本的svn配置就完成了，可以通过svn客户端测试是否能够正常使用。\n查看IP地址ip addr\n通过svn客户端的svn checkout功能进行检出，项目svn地址为：svn://ip地址/版本库名称\n四、开启防火墙端口开放假如你完成了以上配置仍然无法连接的话，那么可能是防火墙给拦截了，可以先试试关闭防火墙再测试（不建议正式环境下使用），或者开放svn的端口。\n4.1 常用命令123456systemctl start firewalld       #启动防火墙systemctl status firewalld       #查看防火墙状态systemctl stop firewalld          #关闭防火墙systemctl restart firewalld       #重启防火墙systemctl enable firewalld.service  #设置开机自启动systemctl disable firewalld.service  #关闭开机自启动\n\n4.2 开启svn的端口svn默认的端口是3690，在开启防火墙的同时支持svn外部访问只要执行以下步骤\n12firewall-cmd --add-port=3690/tcp --permanent firewall-cmd --reload\n\n4.3 关于防火墙配置的其他常用命令1234567891011firewall-cmd --state                           ##查看防火墙状态，是否是runningfirewall-cmd --reload                          ##重新载入配置，比如添加规则之后，需要执行此命令firewall-cmd --get-zones                       ##列出支持的zonefirewall-cmd --get-services                    ##列出支持的服务，在列表中的服务是放行的firewall-cmd --query-service ftp               ##查看ftp服务是否支持，返回yes或者nofirewall-cmd --add-service=ftp                 ##临时开放ftp服务firewall-cmd --add-service=ftp --permanent     ##永久开放ftp服务firewall-cmd --remove-service=ftp --permanent  ##永久移除ftp服务firewall-cmd --add-port=80/tcp --permanent     ##永久添加80端口 iptables -L -n                                 ##查看规则，这个命令是和iptables的相同的man firewall-cmd                               ##查看帮助\n\n五、开机自启SVN5.1 在开机自动文件中添加svn服务修改自启文件 /etc/rc.d/rc.localvi /etc/rc.d/rc.local\n123456# Please note that you must run 'chmod +x /etc/rc.d/rc.local' to ensure# that this script will be executed during boot.touch /var/lock/subsys/local/usr/bin/svnserve -d -r /home/svn   #指定svn路径\n\n5.2 修改权限chmod -X /etc/rc.d/rc.local修改后还是访问不了，提示没有权限，可以试着关闭selinux。\n5.3 关闭selinuxselinux 的开启，容易导致文件权限修改不了等问题，下面就是关闭设置selinux的方法。/usr/sbin/sestatus -v    #查看selinux的开启状态修改/etc/selinux/config 文件vi /etc/selinux/config\n12# mls - Multi Level Security protection.SELINUXTYPE=disabled   #修改为disabled\n\n重启系统即可\n六、通过花生壳外网访问由于公用ip有限，现在大部分使用的都是动态ip，没有固定ip无法进行外网访问，这个时候我们需要做 端口映射，让外网也能访问到我们的svn。为什么使用花生壳呢，名声在外，自己做的怕安全不足。\n6.1 使用端口映射跳过注册，下载软件部分，直接讲解使用花生壳的端口映射部分。内网主机填写的是虚拟机的内部IP，端口如果没有修改，默认使用的是3690。我们要映射的是svn的端口，所以这里选择应用类。端口映射也可以使用到挂载web项目上，如果需要使用web项目，需要修改映射类型。\n6.2 外网访问地址使用客户端svn的svn checkout功能测试，访问地址 svn://外网访问/repo1（repo1为版本库名称）注意：外网访问地址要包括端口\n七、附加说明7.1 更换虚拟分配的IP地址点击vmvare的编辑 - 虚拟网络编辑器直接修改子网ip，修改完记得重启。\n7.2 应用svn的pre-commit以及post-commit在/svn/repo1/hooks目录下的 pree-commit 是作用是强制用户填写提交信息,以方便代码的管理。\n123cp pre-commit.tmpl pre-commit  #将该模板文件重命名为pre-commit文件chmod 755 pre-commit #对该文件添加可执行权限 vi /svn/repo1/hooks/pree-commit     #修改pree-commit文件\n\n修改后代码如下：\n1234567891011#!/bin/shREPOS=\"$1\"TXN=\"$2\"SVNLOOK=svnlook #根据自己的具体情况,指定svnlook命令的具体的路径LOGMSG=`$SVNLOOK log -t \"$TXN\" \"$REPOS\" | grep \"[a-zA-Z0-9]\" | wc -c`#检测提交信息的长度,如果长度小于10个字符就报错if [ \"$LOGMSG\" -lt 10 ];then    echo \"Log message can't be empty! you must input more than 10 chars as comment!.\" 1&gt;&amp;2    exit 1fi\n\npost-commit 则可以把我们提交后的文件自动更新到某一目录下。\n123cp post-commit.tmpl post-commit  #将该模板文件重命名为post-commit文件chmod 755 post-commit #对该文件添加可执行权限 vi /svn/repo1/hooks/post-commit     #修改post-commit文件\n\n修改后代码如下：\n12345678REPOS=\"$1\"REV=\"$2\"#指定字符集,有的时候同步失败,可能就是字符集没有指定export LANG=\"zh_CN.UTF-8\" #调用svn update命令 将版本库中的文件同步到/home/svn/repo1文件中去#这里需要指定用户名以及密码svn update /home/svn/repo1  --username sunms --password james236 --no-auth-cache &gt;&gt; /var/svn-post.log\n\n链接：https://pan.baidu.com/s/1r6Y4LeolSpnwrcWGPy_nHg提取码：yz8t \n","dateCreated":"2019-01-30T16:21:37+08:00","dateModified":"2019-06-26T08:46:13+08:00","datePublished":"2019-01-30T16:21:37+08:00","description":"** 基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统：** &lt;Excerpt in index | 首页摘要&gt;    如果你有空闲主机，放着吃尘，如果你想拥有属于自己的云存储，永久存储自己的文档，那么我建议你看看这篇文章。","headline":"基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"/www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/"},"publisher":{"@type":"Organization","name":"陈哲生","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"/www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/","keywords":"linux"}</script>
+    <title>基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统 | chenzhesheng的博客 | 愿我的只言片语，为你的成长带来帮助！</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="linux">
     <meta name="description" content="** 基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;    如果你有空闲主机，放着吃尘，如果你想拥有属于自己的云存储，永久存储自己的文档，那么我建议你看看这篇文章。">
 <meta name="keywords" content="linux">
-<meta property="og:type" content="blog">
+<meta property="og:type" content="article">
 <meta property="og:title" content="基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统">
 <meta property="og:url" content="www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/index.html">
 <meta property="og:site_name" content="chenzhesheng的博客">
@@ -39,275 +47,169 @@
 <meta name="twitter:description" content="** 基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;    如果你有空闲主机，放着吃尘，如果你想拥有属于自己的云存储，永久存储自己的文档，那么我建议你看看这篇文章。">
 <meta name="twitter:image" content="http://blog.zsonchen.cn/2019-01-29-16-51-24.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
     
-    
-        
-    
-    
-    
-    
-    
-    <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/all.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
-    <!--STYLES END-->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
     
 
-    
-
-    
-        
-    
 </head>
 
-    <body>
-        <div id="blog">
-            <!-- Define author's picture -->
+<body>
+    <div id="loading" class="active"></div>
 
-
-    
-
-<header id="header" data-behavior="4">
-    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
-    <div class="header-title">
-        <a
-            class="header-title-link"
-            href="/ "
-            aria-label=""
-        >
-            chenzhesheng的博客
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
         </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">陈哲生</h5>
+          <a href="mailto:634206017@qq.com" title="634206017@qq.com" class="mail">634206017@qq.com</a>
+        </hgroup>
+      </div>
     </div>
-    
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
         
-            <a
-                class="header-right-picture "
-                href="#about"
-                aria-label="Öffne den Link: /#about"
-            >
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
         
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
         
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/yscoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/ysweb" target="_blank" >
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/custom"  >
+                <i class="icon icon-lg icon-link"></i>
+                测试
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
         </a>
+        <div class="flex-col header-title ellipsis">基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-01-30T08:21:37.000Z" itemprop="datePublished" class="page-time">
+  2019-01-30
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/服务器/">服务器</a></li></ul>
+
+            
+        </h5>
+    </div>
+
     
+
+
 </header>
 
-            <!-- Define author's picture -->
 
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。"><span class="post-toc-number">1.</span> <span class="post-toc-text">关于安装虚拟机的部分跳过，操作相对简单，网上有很多教程，大同小异。</span></a></li></ol></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#一、安装CentOS-7系统"><span class="post-toc-number"></span> <span class="post-toc-text">一、安装CentOS 7系统</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#1-1-点击文件-新建虚拟机-典型-下一步"><span class="post-toc-number"></span> <span class="post-toc-text">1.1 点击文件 - 新建虚拟机 - 典型 - 下一步</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#1-2-安装程序光盘映像文件-下一步"><span class="post-toc-number"></span> <span class="post-toc-text">1.2 安装程序光盘映像文件 - 下一步</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#1-3-填写好登陆用户名与密码-下一步"><span class="post-toc-number"></span> <span class="post-toc-text">1.3 填写好登陆用户名与密码 - 下一步</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#1-4-选择虚拟机存储位置-下一步"><span class="post-toc-number"></span> <span class="post-toc-text">1.4 选择虚拟机存储位置 - 下一步</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#1-5-指定存储大小"><span class="post-toc-number"></span> <span class="post-toc-text">1.5 指定存储大小</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#1-6-点击自定义硬件-把网络适配器更改为桥接模式"><span class="post-toc-number"></span> <span class="post-toc-text">1.6 点击自定义硬件 - 把网络适配器更改为桥接模式</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#二、安装svn版本控制"><span class="post-toc-number"></span> <span class="post-toc-text">二、安装svn版本控制</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#2-1-获取root权限"><span class="post-toc-number"></span> <span class="post-toc-text">2.1 获取root权限</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#2-2-安装svn"><span class="post-toc-number"></span> <span class="post-toc-text">2.2 安装svn</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#2-3-检验svn是否安装成功"><span class="post-toc-number"></span> <span class="post-toc-text">2.3 检验svn是否安装成功</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#2-4-创建版本库"><span class="post-toc-number"></span> <span class="post-toc-text">2.4 创建版本库</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#三、修改svn配置"><span class="post-toc-number"></span> <span class="post-toc-text">三、修改svn配置</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#3-1-修改-passwd-文件添加用户，设置用户密码，使用自带vim-进行编辑修改"><span class="post-toc-number"></span> <span class="post-toc-text">3.1 修改 passwd 文件添加用户，设置用户密码，使用自带vim 进行编辑修改</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#3-2-修改-authz-文件对用户进行分组，以及配置用户读写权限"><span class="post-toc-number"></span> <span class="post-toc-text">3.2 修改 authz 文件对用户进行分组，以及配置用户读写权限</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#3-3-修改-svnserve-conf-文件，这是svn的具体配置文件，如果要使用到上面的-authz、-passwd，就需要修改配置该文件"><span class="post-toc-number"></span> <span class="post-toc-text">3.3 修改 svnserve.conf 文件，这是svn的具体配置文件，如果要使用到上面的 authz、 passwd，就需要修改配置该文件</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#3-4-配置完成，接下来就是开启svn的服务"><span class="post-toc-number"></span> <span class="post-toc-text">3.4 配置完成，接下来就是开启svn的服务</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#四、开启防火墙端口开放"><span class="post-toc-number"></span> <span class="post-toc-text">四、开启防火墙端口开放</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#4-1-常用命令"><span class="post-toc-number"></span> <span class="post-toc-text">4.1 常用命令</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#4-2-开启svn的端口"><span class="post-toc-number"></span> <span class="post-toc-text">4.2 开启svn的端口</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#4-3-关于防火墙配置的其他常用命令"><span class="post-toc-number"></span> <span class="post-toc-text">4.3 关于防火墙配置的其他常用命令</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#五、开机自启SVN"><span class="post-toc-number"></span> <span class="post-toc-text">五、开机自启SVN</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#5-1-在开机自动文件中添加svn服务"><span class="post-toc-number"></span> <span class="post-toc-text">5.1 在开机自动文件中添加svn服务</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#5-2-修改权限"><span class="post-toc-number"></span> <span class="post-toc-text">5.2 修改权限</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#5-3-关闭selinux"><span class="post-toc-number"></span> <span class="post-toc-text">5.3 关闭selinux</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#六、通过花生壳外网访问"><span class="post-toc-number"></span> <span class="post-toc-text">六、通过花生壳外网访问</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#6-1-使用端口映射"><span class="post-toc-number"></span> <span class="post-toc-text">6.1 使用端口映射</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#6-2-外网访问地址"><span class="post-toc-number"></span> <span class="post-toc-text">6.2 外网访问地址</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#七、附加说明"><span class="post-toc-number"></span> <span class="post-toc-text">七、附加说明</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#7-1-更换虚拟分配的IP地址"><span class="post-toc-number"></span> <span class="post-toc-text">7.1 更换虚拟分配的IP地址</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#7-2-应用svn的pre-commit以及post-commit"><span class="post-toc-number"></span> <span class="post-toc-text">7.2 应用svn的pre-commit以及post-commit</span></a>
+        </nav>
+    </aside>
+    
+<article id="post-基于vmvare12虚拟机CentOS 7系统下搭建SVN"
+  class="post-article article-type-post fade" itemprop="blogPost">
 
-<nav id="sidebar" data-behavior="4">
-    <div class="sidebar-container">
-        
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/ "
-                            
-                            title="Home"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Home</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/all-categories"
-                            
-                            title="Kategorien"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Kategorien</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/all-tags"
-                            
-                            title="Tags"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Tags</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/all-archives"
-                            
-                            title="Archiv"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Archiv</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link open-algolia-search"
-                             href="#search"
-                            
-                            title="Suche"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Suche</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="#about"
-                            
-                            title="Über"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Über</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://github.com/" target="_blank" rel="noopener" title="GitHub">
-                    
-                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">GitHub</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
-                    
-                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Stack Overflow</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
-                    
-                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Twitter</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
-                    
-                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google Plus">
-                    
-                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Google Plus</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
-                    
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/mailto"
-                            title="E-Mail"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">E-Mail</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/atom.xml"
-                            
-                            title="RSS"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">RSS</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-    </div>
-</nav>
-
-            
-            <div id="main" data-behavior="4"
-                 class="
-                        hasCoverMetaIn
-                        ">
-                
-<article class="post">
-    
-    
-        <div class="post-header main-content-wrap text-left">
-    
-        <h1 class="post-title">
-            基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统
-        </h1>
-    
-    
+    <div class="post-card">
+        <h1 class="post-card-title">基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统</h1>
         <div class="post-meta">
-    <time datetime="2019-01-30T16:21:37+08:00">
-	
-		    30 Jan 2019
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/服务器/">服务器</a>
+            <time class="post-time" title="2019-01-30 16:21:37" datetime="2019-01-30T08:21:37.000Z"  itemprop="datePublished">2019-01-30</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/服务器/">服务器</a></li></ul>
 
 
-    
-</div>
 
-    
-</div>
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
 
-    
-    <div class="post-content markdown">
-        <div class="main-content-wrap">
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
             <p>** 基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统：** &lt;Excerpt in index | 首页摘要&gt;<br>    如果你有空闲主机，放着吃尘，如果你想拥有属于自己的云存储，永久存储自己的文档，那么我建议你看看这篇文章。</p>
 <a id="more"></a>
 <p>&lt;The rest of contents | 余下全文&gt;</p>
@@ -374,313 +276,105 @@
 
 <p><img src="http://blog.zsonchen.cn/wxchat_QR.jpg" alt><br>链接：<a href="https://pan.baidu.com/s/1r6Y4LeolSpnwrcWGPy_nHg" target="_blank" rel="noopener">https://pan.baidu.com/s/1r6Y4LeolSpnwrcWGPy_nHg</a><br>提取码：yz8t </p>
 
-            
-
-
         </div>
-    </div>
-    <div id="post-footer" class="post-footer main-content-wrap">
-        
-            <div class="post-footer-tags">
-                <span class="text-color-light text-small">GETAGGT IN</span><br/>
-                
-    <a class="tag tag--primary tag--small t-link" href="/tags/linux/">linux</a>
 
-            </div>
+        <blockquote class="post-copyright">
+    <div class="content">
         
+<span class="post-time">
+    最后更新时间：<time datetime="2019-06-26T00:46:13.952Z" itemprop="dateUpdated">2019-06-26 08:46:13</time>
+</span><br>
+
+
         
-            <div class="post-actions-wrap">
-    <nav>
-        <ul class="post-actions post-action-nav">
-            <li class="post-action">
-                
-                    <a
-                        class="post-action-btn btn btn--disabled"
-                        aria-hidden="true"
-                    >
-                        
-                        <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="hide-xs hide-sm text-small icon-ml">FRÜHER</span>
-                    </a>
-            </li>
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2018/04/19/Dagger2注解框架在kotlin中的使用/"
-                    data-tooltip="Dagger2注解框架在kotlin中的使用"
-                    aria-label="NÄCHSTER: Dagger2注解框架在kotlin中的使用"
-                >
-                    
-                        <span class="hide-xs hide-sm text-small icon-mr">NÄCHSTER</span>
-                        <i class="fa fa-angle-right" aria-hidden="true"></i>
-                    </a>
-            </li>
-        </ul>
-    </nav>
-    <ul class="post-actions post-action-share">
-        <li class="post-action hide-lg hide-md hide-sm">
-            <a
-                class="post-action-btn btn btn--default btn-open-shareoptions"
-                href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
-            >
-                <i class="fa fa-share-alt" aria-hidden="true"></i>
-            </a>
-        </li>
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" target="_blank" rel="external">www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/</a>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/"
-                    title="Teilen auf Facebook"
-                    aria-label="Teilen auf Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
+    </div>
+    <footer>
+        <a href="www.chenzhesheng.cc">
+            <img src="/img/avatar.jpg" alt="陈哲生">
+            陈哲生
+        </a>
+    </footer>
+</blockquote>
+
         
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
             
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+
+
             
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/"
-                    title="Teilen auf Twitter"
-                    aria-label="Teilen auf Twitter"
-                >
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/"
-                    title="Teilen auf Google Plus"
-                    aria-label="Teilen auf Google Plus"
-                >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-        
-            
-        
-        <li class="post-action">
-            
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
-            
-                <i class="fa fa-list" aria-hidden="true"></i>
-            </a>
-        </li>
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/&title=《基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统》 — chenzhesheng的博客&pic=www.chenzhesheng.cc/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/&title=《基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统》 — chenzhesheng的博客&source=** 基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统：** &lt;Excerpt in index | 首页摘要&gt;    ..." data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统》 — chenzhesheng的博客&url=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/&via=www.chenzhesheng.cc" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
     </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
 </div>
 
 
-        
-        
-            
-        
-    </div>
-</article>
 
-
-
-                <footer id="footer" class="main-content-wrap">
-    <span class="copyrights">
-        Copyrights &copy; 2019 陈哲生. All Rights Reserved.
-    </span>
-</footer>
-
-            </div>
-            
-                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-                    <div class="post-actions-wrap">
-    <nav>
-        <ul class="post-actions post-action-nav">
-            <li class="post-action">
-                
-                    <a
-                        class="post-action-btn btn btn--disabled"
-                        aria-hidden="true"
-                    >
-                        
-                        <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="hide-xs hide-sm text-small icon-ml">FRÜHER</span>
-                    </a>
-            </li>
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2018/04/19/Dagger2注解框架在kotlin中的使用/"
-                    data-tooltip="Dagger2注解框架在kotlin中的使用"
-                    aria-label="NÄCHSTER: Dagger2注解框架在kotlin中的使用"
-                >
-                    
-                        <span class="hide-xs hide-sm text-small icon-mr">NÄCHSTER</span>
-                        <i class="fa fa-angle-right" aria-hidden="true"></i>
-                    </a>
-            </li>
-        </ul>
-    </nav>
-    <ul class="post-actions post-action-share">
-        <li class="post-action hide-lg hide-md hide-sm">
-            <a
-                class="post-action-btn btn btn--default btn-open-shareoptions"
-                href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
-            >
-                <i class="fa fa-share-alt" aria-hidden="true"></i>
-            </a>
-        </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/"
-                    title="Teilen auf Facebook"
-                    aria-label="Teilen auf Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/"
-                    title="Teilen auf Twitter"
-                    aria-label="Teilen auf Twitter"
-                >
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/"
-                    title="Teilen auf Google Plus"
-                    aria-label="Teilen auf Google Plus"
-                >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-        
-            
-        
-        <li class="post-action">
-            
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
-            
-                <i class="fa fa-list" aria-hidden="true"></i>
-            </a>
-        </li>
-    </ul>
-</div>
-
-
-                </div>
-                
-    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-        <i id="btn-close-shareoptions" class="fa fa-times"></i>
-        <ul class="share-options">
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/"
-                        aria-label="Teilen auf Facebook"
-                    >
-                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Teilen auf Facebook</span>
-                    </a>
-                </li>
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://twitter.com/intent/tweet?text=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/"
-                        aria-label="Teilen auf Twitter"
-                    >
-                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Teilen auf Twitter</span>
-                    </a>
-                </li>
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://plus.google.com/share?url=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/"
-                        aria-label="Teilen auf Google Plus"
-                    >
-                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Teilen auf Google Plus</span>
-                    </a>
-                </li>
-            
-        </ul>
-    </div>
-
-
-            
         </div>
-        
-
-
-<div id="about">
-    <div id="about-card">
-        <div id="about-btn-close">
-            <i class="fa fa-times"></i>
-        </div>
-        
-            <h4 id="about-card-name">陈哲生</h4>
-        
-            <div id="about-card-bio"><p>author.bio</p>
-</div>
-        
-        
-            <div id="about-card-job">
-                <i class="fa fa-briefcase"></i>
-                <br/>
-                <p>author.job</p>
-
-            </div>
-        
-        
     </div>
-</div>
 
-        
-        
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
-        <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
-<!--SCRIPTS END-->
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2018/04/19/Dagger2注解框架在kotlin中的使用/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Dagger2注解框架在kotlin中的使用</h4>
+      </a>
+    </div>
+  
+</nav>
+
 
 
     
@@ -688,5 +382,183 @@
 
 
 
-    </body>
+
+
+
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/img/wechat.jpg" alt="打赏二维码">
+        </div>
+        
+        <label class="reward-toggle">
+            <input id="rewardToggle" type="checkbox" class="reward-toggle-check"
+                data-wechat="/img/wechat.jpg" data-alipay="/img/alipay.jpg">
+            <div class="reward-toggle-ctrol">
+                <span class="reward-toggle-item wechat">微信</span>
+                <span class="reward-toggle-label"></span>
+                <span class="reward-toggle-item alipay">支付宝</span>
+            </div>
+        </label>
+        
+    </div>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>陈哲生 &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/&title=《基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统》 — chenzhesheng的博客&pic=www.chenzhesheng.cc/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/&title=《基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统》 — chenzhesheng的博客&source=** 基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统：** &lt;Excerpt in index | 首页摘要&gt;    ..." data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统》 — chenzhesheng的博客&url=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/&via=www.chenzhesheng.cc" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=www.chenzhesheng.cc/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
 </html>

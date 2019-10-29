@@ -1,20 +1,28 @@
-
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
     
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="chenzhesheng的博客">
-    <title>Android触摸事件传递机制 - chenzhesheng的博客</title>
-    <meta name="author" content="陈哲生">
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"陈哲生","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"** Android触摸事件传递机制：** &lt;Excerpt in index | 首页摘要&gt;本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。\n\n&lt;The rest of contents | 余下全文&gt;    前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。\n一.触摸事件的类型触摸事件对应的是 MotionEvent 类，事件类型主要有三种：\n\nACTION_DOWN：用户按下操作，表示一次触摸事件的开始。 \nACTION_MOVE：在按下的情况下，进行移动。轻微的移动都会传递到该事件。\nACTION_UP：用户手指离开屏幕，表示一次触摸事件的\n\n注 ：如果用户仅仅的是点击而已，则只会执行到 ACTION_DOWN 和 ACTION_UP 两个事件，不会执行到 ACTION_MOVE 事件。所以 ACTION_DOWN 和 ACTION_UP 是事件是必须的。\n二.触摸事件的传递阶段1.分发（Dispatch）在Android系统中所有的触摸事件都是由 dispatchTouchEvent  方法进行分发的。该方法中判断事件是被消费（return true），还是继续分发给子视图处理（return super.dispatchTouchEvent），如果当前视图是ViewGroup或者其子类，则会调用onInterceptTouchEvent 判断是否截拦。\n1234@Overridepublic boolean dispatchTouchEvent(MotionEvent event) &#123;    return super.dispatchTouchEvent(event);&#125;\n\n2.截拦（Intercept）事件的截拦 InterceptTouchEvent  只存在于ViewGroup及其子类，activity和View是不存在该方法。该方法判断事件是被截拦 （return true）并交给自身的 OnToucEvent 方法进行消费，还是继续传递给子视图（return super.InterceptTouchEvent 或者 return false）。\n1234@Overridepublic boolean onInterceptTouchEvent(MotionEvent ev) &#123;    return super.onInterceptTouchEvent(ev);&#125;\n\n3.消费（Consume）事件的消费通过 OnTouchEvent 方法判断，是被消费（return true）,还是不处理（return false）并将事件传递给父视图的 OnTouchEvent 方法进行处理。\n1234@Overridepublic boolean onTouchEvent(MotionEvent event) &#123;    return super.onTouchEvent(event);&#125;\n\n所有拥有事件传递能力的类：Activity： 拥有dispatchTouchEvent 、OnTouchEventViewGroup： 拥有dispatchTouchEvent 、OnInterceptTouchEvent 、OnTouchEventView：拥有dispatchTouchEvent 、OnTouchEvent\n三、View的事件传递机制3.1 dome虽然说ViewGroup是View的子类，但是这是说的View指的是除ViewGroup之外的View控件子类，首先定义一个MyTextView继承TextView，打印每次事件的触发以变了解事件传递的流程。\nMyTextView 类\n123456789101112131415161718192021222324252627282930313233343536373839404142434445public class MyTextView extends TextView &#123;    private String tag = \"MyTextView\";    public MyTextView(Context context) &#123;        super(context);    &#125;    public MyTextView(Context context, AttributeSet attrs) &#123;        super(context, attrs);    &#125;    @Override    public boolean dispatchTouchEvent(MotionEvent event) &#123;        switch (event.getAction())&#123;            case MotionEvent.ACTION_UP:                Log.i(tag, \"dispatchTouchEvent ACTION_UP\");                break;            case MotionEvent.ACTION_MOVE:                Log.i(tag, \"dispatchTouchEvent ACTION_MOVE\");                break;            case MotionEvent.ACTION_DOWN:                Log.i(tag, \"dispatchTouchEvent ACTION_DOWN\");                break;        &#125;        return super.dispatchTouchEvent(event);    &#125;    @Override    public boolean onTouchEvent(MotionEvent event) &#123;        switch (event.getAction())&#123;            case MotionEvent.ACTION_UP:                Log.i(tag, \"onTouchEvent ACTION_UP\");                break;            case MotionEvent.ACTION_MOVE:                Log.i(tag, \"onTouchEvent ACTION_MOVE\");                break;            case MotionEvent.ACTION_DOWN:                Log.i(tag, \"onTouchEvent ACTION_DOWN\");                break;        &#125;        return super.onTouchEvent(event);    &#125;&#125;\n\n\n定义一个MainActivity来展现这个MyTextView，同时设置点击（onClick）和触摸（onTouch）监听。MainActivity 类\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778public class MainActivity extends AppCompatActivity implements View.OnClickListener,View.OnTouchListener&#123;    private MyTextView mMyTextView;    private String tag = \"MainActiviy\";    @Override    protected void onCreate(Bundle savedInstanceState) &#123;        super.onCreate(savedInstanceState);        setContentView(R.layout.activity_main);        mMyTextView = findViewById(R.id.text_view);        //  点击监听        mMyTextView.setOnClickListener(this);        //  触碰监听        mMyTextView.setOnTouchListener(this);    &#125;    // MyTextView 点击事件    @Override    public void onClick(View view) &#123;        switch (view.getId())&#123;            case R.id.text_view:                Log.i(tag, \"MyTextView onClick\");                break;        &#125;    &#125;    // MyTextView 触碰事件    @Override    public boolean onTouch(View view, MotionEvent motionEvent) &#123;        switch (motionEvent.getAction())&#123;            case MotionEvent.ACTION_UP:                Log.i(tag, \"MyTextView onTouch ACTION_UP\");                break;            case MotionEvent.ACTION_MOVE:                Log.i(tag, \"MyTextView onTouch ACTION_MOVE\");                break;            case MotionEvent.ACTION_DOWN:                Log.i(tag, \"MyTextView onTouch ACTION_DOWN\");                break;        &#125;        return false;    &#125;    // Activity　的事件分发    @Override    public boolean dispatchTouchEvent(MotionEvent ev) &#123;        switch (ev.getAction())&#123;            case MotionEvent.ACTION_UP:                Log.i(tag, \"dispatchTouchEvent ACTION_UP\");                break;            case MotionEvent.ACTION_MOVE:                Log.i(tag, \"dispatchTouchEvent ACTION_MOVE\");                break;            case MotionEvent.ACTION_DOWN:                Log.i(tag, \"dispatchTouchEvent ACTION_DOWN\");                break;        &#125;        return super.dispatchTouchEvent(ev);    &#125;    // Activity 的事件消费    @Override    public boolean onTouchEvent(MotionEvent event) &#123;        switch (event.getAction())&#123;            case MotionEvent.ACTION_UP:                Log.i(tag, \"onTouchEvent ACTION_UP\");                break;            case MotionEvent.ACTION_MOVE:                Log.i(tag, \"onTouchEvent ACTION_MOVE\");                break;            case MotionEvent.ACTION_DOWN:                Log.i(tag, \"onTouchEvent ACTION_DOWN\");                break;        &#125;        return super.onTouchEvent(event);    &#125;&#125;\n\n3.2 打印日志运行后，点击Text View反馈的打印日志\n12345678903-28 08:05:14.824 1219-1219/com.mvp.chenzhesheng.androidadvance I/MainActiviy: dispatchTouchEvent ACTION_DOWN03-28 08:05:14.824 1219-1219/com.mvp.chenzhesheng.androidadvance I/MyTextView: dispatchTouchEvent ACTION_DOWN03-28 08:05:14.824 1219-1219/com.mvp.chenzhesheng.androidadvance I/MainActiviy: MyTextView onTouch ACTION_DOWN03-28 08:05:14.824 1219-1219/com.mvp.chenzhesheng.androidadvance I/MyTextView: onTouchEvent ACTION_DOWN03-28 08:05:15.034 1219-1219/com.mvp.chenzhesheng.androidadvance I/MainActiviy: dispatchTouchEvent ACTION_UP03-28 08:05:15.034 1219-1219/com.mvp.chenzhesheng.androidadvance I/MyTextView: dispatchTouchEvent ACTION_UP03-28 08:05:15.034 1219-1219/com.mvp.chenzhesheng.androidadvance I/MainActiviy: MyTextView onTouch ACTION_UP03-28 08:05:15.034 1219-1219/com.mvp.chenzhesheng.androidadvance I/MyTextView: onTouchEvent ACTION_UP03-28 08:05:15.044 1219-1219/com.mvp.chenzhesheng.androidadvance I/MainActiviy: MyTextView onClick\n\n\ndispatchTouchEvent 、 OnTouchEvent 这两个方法的返回值存在三种情况：\n\n直接返回true。\n直接返回false。\n返回父类同名方法，super.dispatchTouchEvent 或者 super.OnTouchEvent。\n\n由于拥有不同的返回值，所以事件传递流程也有不同，经过不断修改返回值测试，最终得到了点击事件的流程图，ACTION_DOWN 和 ACTION_UP 事件的传递流程是相同的。\n3.3 事件传递流程图从上面的流程图可以得出结论：\n\n触摸事件是从 dispatchTouchEvent  开始的，默认返回父类同名方法 super ，事件将会依照嵌套层次从外向内传递（ MainActivity 到 MyTextView ），到达最内层的 View 时，将由 View 的 OnTouchEvent  方法处理，该方法返回 true 时进行消费不再传递，返回 false 时再由内向外传递，由外层的 OnTouchEvent 处理。\n如果外层向内层传递过程中，人为干扰返回 true 消费，则不会继续继续像内部传递。\nView 的事件控制顺序先执行 onTouch 再执行 onClick ，如果 onTouch 返回 true 消费，则不会继续传递，也不会执行 onClick 方法。\n\n四、ViewGroup的事件传递机制4.1 domeViewGroup 是 View 的控件容器存在，拥有 dispatchTouchEvent 、 onInterceptTouchEvent 和 onTouchEvent 三个方法，比 View 多了一个 onInterceptTouchEvent 方法。为了更好的观察，我们需要自定义 MyRelativeLayout 继承 RelativeLayout 。\nMyRelativeLayout类\n123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960public class MyRelativeLayout extends RelativeLayout &#123;    private final static String tag = \"MyRelativeLayout\";    public MyRelativeLayout(Context context) &#123;        super(context);    &#125;    public MyRelativeLayout(Context context, AttributeSet attrs) &#123;        super(context, attrs);    &#125;    @Override    public boolean dispatchTouchEvent(MotionEvent ev) &#123;        switch (ev.getAction())&#123;            case MotionEvent.ACTION_UP:                Log.i(tag, \"dispatchTouchEvent ACTION_UP\");                break;            case MotionEvent.ACTION_MOVE:                Log.i(tag, \"dispatchTouchEvent ACTION_MOVE\");                break;            case MotionEvent.ACTION_DOWN:                Log.i(tag, \"dispatchTouchEvent ACTION_DOWN\");                break;        &#125;        return super.dispatchTouchEvent(ev);    &#125;    @Override    public boolean onInterceptTouchEvent(MotionEvent ev) &#123;        switch (ev.getAction())&#123;            case MotionEvent.ACTION_UP:                Log.i(tag, \"onInterceptTouchEvent ACTION_UP\");                break;            case MotionEvent.ACTION_MOVE:                Log.i(tag, \"onInterceptTouchEvent ACTION_MOVE\");                break;            case MotionEvent.ACTION_DOWN:                Log.i(tag, \"onInterceptTouchEvent ACTION_DOWN\");                break;        &#125;        return super.onInterceptTouchEvent(ev);    &#125;    @Override    public boolean onTouchEvent(MotionEvent event) &#123;        switch (event.getAction())&#123;            case MotionEvent.ACTION_UP:                Log.i(tag, \"onTouchEvent ACTION_UP\");                break;            case MotionEvent.ACTION_MOVE:                Log.i(tag, \"onTouchEvent ACTION_MOVE\");                break;            case MotionEvent.ACTION_DOWN:                Log.i(tag, \"onTouchEvent ACTION_DOWN\");                break;        &#125;        return super.onTouchEvent(event);    &#125;&#125;\n\nmain_activity.xml 文件\n12345678910111213141516&lt;?xml version=\"1.0\" encoding=\"utf-8\"?&gt;&lt;com.mvp.chenzhesheng.androidadvance.MyRelativeLayout    xmlns:android=\"http://schemas.android.com/apk/res/android\"    xmlns:tools=\"http://schemas.android.com/tools\"    android:layout_width=\"match_parent\"    android:layout_height=\"match_parent\"    &gt;    &lt;com.mvp.chenzhesheng.androidadvance.MyTextView        android:id=\"@+id/text_view\"        android:clickable=\"true\"        android:layout_width=\"wrap_content\"        android:layout_height=\"wrap_content\"        android:text=\"Hello World!\"&lt;/com.mvp.chenzhesheng.androidadvance.MyRelativeLayout&gt;\n\n4.2 打印日志1234567891011121304-02 08:47:57.980 1030-1030/com.mvp.chenzhesheng.androidadvance I/MainActiviy: dispatchTouchEvent ACTION_DOWN04-02 08:47:58.000 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyRelativeLayout: dispatchTouchEvent ACTION_DOWN04-02 08:47:58.000 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyRelativeLayout: onInterceptTouchEvent ACTION_DOWN04-02 08:47:58.000 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyTextView: dispatchTouchEvent ACTION_DOWN04-02 08:47:58.010 1030-1030/com.mvp.chenzhesheng.androidadvance I/MainActiviy: MyTextView onTouch ACTION_DOWN04-02 08:47:58.010 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyTextView: onTouchEvent ACTION_DOWN04-02 08:47:58.200 1030-1030/com.mvp.chenzhesheng.androidadvance I/MainActiviy: dispatchTouchEvent ACTION_UP04-02 08:47:58.200 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyRelativeLayout: dispatchTouchEvent ACTION_UP04-02 08:47:58.200 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyRelativeLayout: onInterceptTouchEvent ACTION_UP04-02 08:47:58.200 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyTextView: dispatchTouchEvent ACTION_UP04-02 08:47:58.210 1030-1030/com.mvp.chenzhesheng.androidadvance I/MainActiviy: MyTextView onTouch ACTION_UP04-02 08:47:58.210 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyTextView: onTouchEvent ACTION_UP04-02 08:47:58.260 1030-1030/com.mvp.chenzhesheng.androidadvance I/MainActiviy: MyTextView onClick\n\n\n可以看到 MainActivity 和 MyTextView 的事件传递处理中添加了一层 MyRelativeLayout 。通过不同返回值测试，得到一套流程图。\n4.3 流程图从上面的流程图可以得出结论：\n\n触摸事件传递是从 Activity 传递到 ViewGroup ,再传递到 View 。如果中间没有 ViewGroup 则直接从 Activity 传递到 View 。\nViewGroup 通过 onInterceptTouchEvent 方法对事件进行截拦，如果返回 false 或者 super.onInterceptTouchEvent ，则事件会继续传递给子 View 。\n子 View 中对事件进行消费后，ViewGroup 将不会接收到任何事件。\n\n五.总结\n事件分发是由外到内，从 Activity 到具体的子 View ；\n事件处理消费是由内到外，从子 View 到最外层 Activity ；\n事件拦截只存在于 ViewGroup 中；\n掌握事件传递机制可以更好的进行事件处理，无论是自定义 View 还是阅读 Framework 层源码都需要对事件传递进行学习，才能更精致的开发应用。\n\n\n","dateCreated":"2018-03-27T19:05:51+08:00","dateModified":"2019-04-20T17:19:32+08:00","datePublished":"2018-03-27T19:05:51+08:00","description":"** Android触摸事件传递机制：** &lt;Excerpt in index | 首页摘要&gt;本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。","headline":"Android触摸事件传递机制","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"/www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/"},"publisher":{"@type":"Organization","name":"陈哲生","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"/www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/","keywords":"Android"}</script>
+    <title>Android触摸事件传递机制 | chenzhesheng的博客 | 愿我的只言片语，为你的成长带来帮助！</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Android">
     <meta name="description" content="** Android触摸事件传递机制：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
 <meta name="keywords" content="Android">
-<meta property="og:type" content="blog">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Android触摸事件传递机制">
 <meta property="og:url" content="www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/index.html">
 <meta property="og:site_name" content="chenzhesheng的博客">
@@ -29,275 +37,169 @@
 <meta name="twitter:description" content="** Android触摸事件传递机制：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
 <meta name="twitter:image" content="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E7%9A%84%E4%BC%A0%E9%80%92.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
     
-    
-        
-    
-    
-    
-    
-    
-    <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/all.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
-    <!--STYLES END-->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
     
 
-    
-
-    
-        
-    
 </head>
 
-    <body>
-        <div id="blog">
-            <!-- Define author's picture -->
+<body>
+    <div id="loading" class="active"></div>
 
-
-    
-
-<header id="header" data-behavior="4">
-    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
-    <div class="header-title">
-        <a
-            class="header-title-link"
-            href="/ "
-            aria-label=""
-        >
-            chenzhesheng的博客
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
         </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">陈哲生</h5>
+          <a href="mailto:634206017@qq.com" title="634206017@qq.com" class="mail">634206017@qq.com</a>
+        </hgroup>
+      </div>
     </div>
-    
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
         
-            <a
-                class="header-right-picture "
-                href="#about"
-                aria-label="Öffne den Link: /#about"
-            >
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
         
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
         
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/yscoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/ysweb" target="_blank" >
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/custom"  >
+                <i class="icon icon-lg icon-link"></i>
+                测试
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
         </a>
+        <div class="flex-col header-title ellipsis">Android触摸事件传递机制</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Android触摸事件传递机制</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-03-27T11:05:51.000Z" itemprop="datePublished" class="page-time">
+  2018-03-27
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+            
+        </h5>
+    </div>
+
     
+
+
 </header>
 
-            <!-- Define author's picture -->
 
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#一-触摸事件的类型"><span class="post-toc-number">1.</span> <span class="post-toc-text">一.触摸事件的类型</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#二-触摸事件的传递阶段"><span class="post-toc-number">2.</span> <span class="post-toc-text">二.触摸事件的传递阶段</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-分发（Dispatch）"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">1.分发（Dispatch）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-截拦（Intercept）"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">2.截拦（Intercept）</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-消费（Consume）"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">3.消费（Consume）</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#三、View的事件传递机制"><span class="post-toc-number">3.</span> <span class="post-toc-text">三、View的事件传递机制</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-1-dome"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">3.1 dome</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-2-打印日志"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">3.2 打印日志</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-3-事件传递流程图"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">3.3 事件传递流程图</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#四、ViewGroup的事件传递机制"><span class="post-toc-number">4.</span> <span class="post-toc-text">四、ViewGroup的事件传递机制</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#4-1-dome"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">4.1 dome</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#4-2-打印日志"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">4.2 打印日志</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#4-3-流程图"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">4.3 流程图</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#五-总结"><span class="post-toc-number">5.</span> <span class="post-toc-text">五.总结</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Android触摸事件传递机制"
+  class="post-article article-type-post fade" itemprop="blogPost">
 
-<nav id="sidebar" data-behavior="4">
-    <div class="sidebar-container">
-        
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/ "
-                            
-                            title="Home"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Home</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/all-categories"
-                            
-                            title="Kategorien"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Kategorien</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/all-tags"
-                            
-                            title="Tags"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Tags</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/all-archives"
-                            
-                            title="Archiv"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Archiv</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link open-algolia-search"
-                             href="#search"
-                            
-                            title="Suche"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Suche</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="#about"
-                            
-                            title="Über"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Über</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://github.com/" target="_blank" rel="noopener" title="GitHub">
-                    
-                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">GitHub</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
-                    
-                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Stack Overflow</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
-                    
-                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Twitter</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
-                    
-                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google Plus">
-                    
-                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Google Plus</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
-                    
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/mailto"
-                            title="E-Mail"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">E-Mail</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/atom.xml"
-                            
-                            title="RSS"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">RSS</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-    </div>
-</nav>
-
-            
-            <div id="main" data-behavior="4"
-                 class="
-                        hasCoverMetaIn
-                        ">
-                
-<article class="post">
-    
-    
-        <div class="post-header main-content-wrap text-left">
-    
-        <h1 class="post-title">
-            Android触摸事件传递机制
-        </h1>
-    
-    
+    <div class="post-card">
+        <h1 class="post-card-title">Android触摸事件传递机制</h1>
         <div class="post-meta">
-    <time datetime="2018-03-27T19:05:51+08:00">
-	
-		    27 Mar 2018
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/Android/">Android</a>
+            <time class="post-time" title="2018-03-27 19:05:51" datetime="2018-03-27T11:05:51.000Z"  itemprop="datePublished">2018-03-27</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
 
 
-    
-</div>
 
-    
-</div>
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
 
-    
-    <div class="post-content markdown">
-        <div class="main-content-wrap">
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
             <p>** Android触摸事件传递机制：** &lt;Excerpt in index | 首页摘要&gt;<br>本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</p>
 <a id="more"></a>
 <p>&lt;The rest of contents | 余下全文&gt;<br>    前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</p>
@@ -368,319 +270,112 @@
 </ol>
 <p><img src="http://blog.zsonchen.cn/wxchat_QR.jpg" alt></p>
 
-            
-
-
         </div>
-    </div>
-    <div id="post-footer" class="post-footer main-content-wrap">
-        
-            <div class="post-footer-tags">
-                <span class="text-color-light text-small">GETAGGT IN</span><br/>
-                
-    <a class="tag tag--primary tag--small t-link" href="/tags/Android/">Android</a>
 
-            </div>
+        <blockquote class="post-copyright">
+    <div class="content">
         
+<span class="post-time">
+    最后更新时间：<time datetime="2019-04-20T09:19:32.342Z" itemprop="dateUpdated">2019-04-20 17:19:32</time>
+</span><br>
+
+
         
-            <div class="post-actions-wrap">
-    <nav>
-        <ul class="post-actions post-action-nav">
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2018/04/19/Dagger2注解框架在kotlin中的使用/"
-                    data-tooltip="Dagger2注解框架在kotlin中的使用"
-                    aria-label="FRÜHER: Dagger2注解框架在kotlin中的使用"
-                >
-                    
-                        <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="hide-xs hide-sm text-small icon-ml">FRÜHER</span>
-                    </a>
-            </li>
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/"
-                    data-tooltip="基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南"
-                    aria-label="NÄCHSTER: 基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南"
-                >
-                    
-                        <span class="hide-xs hide-sm text-small icon-mr">NÄCHSTER</span>
-                        <i class="fa fa-angle-right" aria-hidden="true"></i>
-                    </a>
-            </li>
-        </ul>
-    </nav>
-    <ul class="post-actions post-action-share">
-        <li class="post-action hide-lg hide-md hide-sm">
-            <a
-                class="post-action-btn btn btn--default btn-open-shareoptions"
-                href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
-            >
-                <i class="fa fa-share-alt" aria-hidden="true"></i>
-            </a>
-        </li>
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/2018/03/27/Android触摸事件传递机制/" target="_blank" rel="external">www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/</a>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/"
-                    title="Teilen auf Facebook"
-                    aria-label="Teilen auf Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
+    </div>
+    <footer>
+        <a href="www.chenzhesheng.cc">
+            <img src="/img/avatar.jpg" alt="陈哲生">
+            陈哲生
+        </a>
+    </footer>
+</blockquote>
+
         
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
             
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li></ul>
+
+
             
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/"
-                    title="Teilen auf Twitter"
-                    aria-label="Teilen auf Twitter"
-                >
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/"
-                    title="Teilen auf Google Plus"
-                    aria-label="Teilen auf Google Plus"
-                >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-        
-            
-        
-        <li class="post-action">
-            
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
-            
-                <i class="fa fa-list" aria-hidden="true"></i>
-            </a>
-        </li>
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/&title=《Android触摸事件传递机制》 — chenzhesheng的博客&pic=www.chenzhesheng.cc/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/&title=《Android触摸事件传递机制》 — chenzhesheng的博客&source=** Android触摸事件传递机制：** &lt;Excerpt in index | 首页摘要&gt;本文章将会详细介绍Activity、View、V..." data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android触摸事件传递机制》 — chenzhesheng的博客&url=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/&via=www.chenzhesheng.cc" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
     </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
 </div>
 
 
-        
-        
-            
-        
-    </div>
-</article>
 
-
-
-                <footer id="footer" class="main-content-wrap">
-    <span class="copyrights">
-        Copyrights &copy; 2019 陈哲生. All Rights Reserved.
-    </span>
-</footer>
-
-            </div>
-            
-                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-                    <div class="post-actions-wrap">
-    <nav>
-        <ul class="post-actions post-action-nav">
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2018/04/19/Dagger2注解框架在kotlin中的使用/"
-                    data-tooltip="Dagger2注解框架在kotlin中的使用"
-                    aria-label="FRÜHER: Dagger2注解框架在kotlin中的使用"
-                >
-                    
-                        <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="hide-xs hide-sm text-small icon-ml">FRÜHER</span>
-                    </a>
-            </li>
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/"
-                    data-tooltip="基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南"
-                    aria-label="NÄCHSTER: 基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南"
-                >
-                    
-                        <span class="hide-xs hide-sm text-small icon-mr">NÄCHSTER</span>
-                        <i class="fa fa-angle-right" aria-hidden="true"></i>
-                    </a>
-            </li>
-        </ul>
-    </nav>
-    <ul class="post-actions post-action-share">
-        <li class="post-action hide-lg hide-md hide-sm">
-            <a
-                class="post-action-btn btn btn--default btn-open-shareoptions"
-                href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
-            >
-                <i class="fa fa-share-alt" aria-hidden="true"></i>
-            </a>
-        </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/"
-                    title="Teilen auf Facebook"
-                    aria-label="Teilen auf Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/"
-                    title="Teilen auf Twitter"
-                    aria-label="Teilen auf Twitter"
-                >
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/"
-                    title="Teilen auf Google Plus"
-                    aria-label="Teilen auf Google Plus"
-                >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-        
-            
-        
-        <li class="post-action">
-            
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
-            
-                <i class="fa fa-list" aria-hidden="true"></i>
-            </a>
-        </li>
-    </ul>
-</div>
-
-
-                </div>
-                
-    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-        <i id="btn-close-shareoptions" class="fa fa-times"></i>
-        <ul class="share-options">
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/"
-                        aria-label="Teilen auf Facebook"
-                    >
-                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Teilen auf Facebook</span>
-                    </a>
-                </li>
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://twitter.com/intent/tweet?text=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/"
-                        aria-label="Teilen auf Twitter"
-                    >
-                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Teilen auf Twitter</span>
-                    </a>
-                </li>
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/"
-                        aria-label="Teilen auf Google Plus"
-                    >
-                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Teilen auf Google Plus</span>
-                    </a>
-                </li>
-            
-        </ul>
-    </div>
-
-
-            
         </div>
-        
-
-
-<div id="about">
-    <div id="about-card">
-        <div id="about-btn-close">
-            <i class="fa fa-times"></i>
-        </div>
-        
-            <h4 id="about-card-name">陈哲生</h4>
-        
-            <div id="about-card-bio"><p>author.bio</p>
-</div>
-        
-        
-            <div id="about-card-job">
-                <i class="fa fa-briefcase"></i>
-                <br/>
-                <p>author.job</p>
-
-            </div>
-        
-        
     </div>
-</div>
 
-        
-        
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
-        <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
-<!--SCRIPTS END-->
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2018/04/19/Dagger2注解框架在kotlin中的使用/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Dagger2注解框架在kotlin中的使用</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南</h4>
+      </a>
+    </div>
+  
+</nav>
+
 
 
     
@@ -688,5 +383,183 @@
 
 
 
-    </body>
+
+
+
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/img/wechat.jpg" alt="打赏二维码">
+        </div>
+        
+        <label class="reward-toggle">
+            <input id="rewardToggle" type="checkbox" class="reward-toggle-check"
+                data-wechat="/img/wechat.jpg" data-alipay="/img/alipay.jpg">
+            <div class="reward-toggle-ctrol">
+                <span class="reward-toggle-item wechat">微信</span>
+                <span class="reward-toggle-label"></span>
+                <span class="reward-toggle-item alipay">支付宝</span>
+            </div>
+        </label>
+        
+    </div>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>陈哲生 &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/&title=《Android触摸事件传递机制》 — chenzhesheng的博客&pic=www.chenzhesheng.cc/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/&title=《Android触摸事件传递机制》 — chenzhesheng的博客&source=** Android触摸事件传递机制：** &lt;Excerpt in index | 首页摘要&gt;本文章将会详细介绍Activity、View、V..." data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android触摸事件传递机制》 — chenzhesheng的博客&url=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/&via=www.chenzhesheng.cc" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
 </html>

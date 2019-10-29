@@ -1,20 +1,28 @@
-
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
     
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="chenzhesheng的博客">
-    <title>基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南 - chenzhesheng的博客</title>
-    <meta name="author" content="陈哲生">
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"陈哲生","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"** 基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南：** &lt;Excerpt in index | 首页摘要&gt;腾讯云服务器，配置java后台环境。\n\n&lt;The rest of contents | 余下全文&gt;\n前言：本人于2018年03月06日购买了腾讯云服务器，用于java后台使用。由于是第一次使用，于是乎有了这篇文章。文章将直接跳过购买部分，来到配置java和后台环境部分。使用工具：xshell、xftpxshell：可连接远程服务器，使用命令操作远程服务器xftp：用来向服务器传输文件\n一、连接服务器。1.使用xshell连接服务器在腾讯云的管理页面找到购买的主机，设置用户名和密码，还有记住公网ip跟端口号。\n打开xshell，输入服务器地址与端口号，点击连接，首次进入需输入用户名密码，这些在腾讯云后台可看到，记住密码则不用每次进入都输入。\n2.重置root权限密码进入界面后，输入：sudo passwd输入新密码 + 回车 * 3次\n3.获取usr用户根目录的权限root指令su root输入root密码 + 回车\n二、配置java环境1.上传解压jdk环境压缩包1.1 创建java目录：mkdir /usr/local/java\n1.2 在jdk官网下载好linux对应系统位数的安装包，使用xftp上传到服务器，shell指令复制到/usr/local/java目录下\n1.3 使用cd进入到目录下解压sudo tar xvf jdk-8u121-linux-x64.tar.gz\n1.4 删除原压缩包sudo rm jdk-8u121-linux-x64.tar.gz\n###2.更改环境变量2.1 使用vim打开.bashrc环境配置文件sudo vim ~/.bashrc\n2.2 在文件结尾添加（注意文件夹名字要匹配好jdk版本号）：export JAVA_HOME=/usr/local/java/jdk1.8.0_161export JRE_HOME=${JAVA_HOME}/jreexport CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/libexport PATH=${JAVA_HOME}/bin:$PATH\n2.3 保存并退出,输入:wq回车\n2.4 应用环境配置source ~/.bashrc\n2.5 检验java环境是否配置好java -version返回：\n123java version \"1.8.0_161\"Java(TM) SE Runtime Environment (build 1.8.0_161-b12)Java HotSpot(TM) 64-Bit Server VM (build 25.161-b12, mixed mode)\n\n2.6 如果出现没有权限 Permission is not allowed,需要手动修改目录权限chmod 777 &lt;文件夹名&gt;\n三、配置tomcat###1.下载解压安装包1.1 tomcat官网下载apache-tomcat-7.0.78.tar.gz \n1.2 解压安装包tar -zxvf apache-tomcat-7.0.78.tar.gz\n1.3 删除安装包sudo rm apache-tomcat-7.0.78.tar.gz\n###2.修改启动器2.1 修改startup.sh 启动文件cd apche-tomcat-7.0.78/binsudo vim startup.sh\n2.2 在esac下面添加：JAVA_HOME=/usr/local/java/jdk1.8.0_161JRE_HOME=/usr/local/java/jdk1.8.0_161/jrePATH=$JAVA_HOME/bin:$JRE_HOME:$PATHCLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jarTOMCAT_HOME=/home/ubuntu/apache-tomcat-7.0.78\n2.3 保存退出：:wq\n2.4 启动tomcatsudo ./startup.sh返回\n123456Using CATALINA_BASE:   /home/ubuntu/apache-tomcat-7.0.85Using CATALINA_HOME:   /home/ubuntu/apache-tomcat-7.0.85Using CATALINA_TMPDIR: /home/ubuntu/apache-tomcat-7.0.85/tempUsing JRE_HOME:        /usr/local/java/jdk1.8.0_161Using CLASSPATH:       /home/ubuntu/apache-tomcat-7.0.85/bin/bootstrap.jar:/home/ubuntu/apache-tomcat-   7.0.85/bin/tomcat-juli.jarTomcat started.\n\n2.5 检查在浏览器输入localhost:8080，可以看到tomcat首页界面。\n2.6 关闭tomcatsudo ./shutdown.sh\n若是关闭tomcat出现\n12Neither the JAVA_HOME nor the JRE_HOME environment variable is definedAt least one of these environment variable is needed to run this program\n\n因为tomcat无法识别到环境变量，则需修改setclasspath.sh文件sudo vim setclasspath.sh\n由于无法识别java_home和jre_home的环境变量，需要我们手动在文件头添加。\n12JAVA_HOME=/usr/local/java/jdk1.8.0_161JRE_HOME=/usr/local/java/jdk1.8.0_161/jre\n\n可以正常关闭tomcat，则说明修改完成。\n四、配置mysql1.安装mysql1.1 linux安装mysql环境很简单，只需逐步执行以下指令即可。sudo apt-get install mysql-server 期间需要设置密码apt-get isntall mysql-clientsudo apt-get install libmysqlclient-dev\n1.2 检查查看3306端口是否正常netstat -an | grep 3306如果处于listen则表示安装成功\n1tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN\n\n2.登录mysql数据库mysql -u root -p选择登录 -u 用户名为 root 输入密码 -p此时输入密码就可以登录mysql\n12345678910111213Welcome to the MySQL monitor.  Commands end with ; or \\g.Your MySQL connection id is 1705Server version: 5.7.21-0ubuntu0.16.04.1 (Ubuntu)Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.Oracle is a registered trademark of Oracle Corporation and/or itsaffiliates. Other names may be trademarks of their respectiveowners.Type 'help;' or '\\h' for help. Type '\\c' to clear the current input statement.mysql&gt;\n\n3.创建远程访问mysql用户3.1 查询表显示当前的数据库show databases;显示当前数据库的表单show tables;\n3.2 远程访问用户mysql默认是本机127.0.0.1访问数据库，想要远程访问需要开放mysql服务器并创建新的用户来访问mysql。\n3.2.1 开放服务器修改配置文件：mysql5.7以下的的配置文件在/etc/mysql/my.cnf文件内，里面有一行bind-address = 127.0.0.1表示只允许本地访问，将它注释掉。mysql5.7版本或以上的配置文件在在/etc/mysql/mysql.conf.d目录下的mysqld.cnf文件\n3.2.2 创建新用户赋予远程ip访问权限：查询mysql的用户表select user,authentication_string,host from mysql.user;\n3.2.3 创建新用户grant all privileges on *.* to &#39;myuser&#39; @&#39;46.224.259.19&#39; identified by &#39;password&#39; with grant option;创建用户myuser使用password从ip 46.224.259.19连接到mysql服务器当然，ip 地址处可以修改为 ‘%’，指任意ip地址，实际环境不予许，慎用。\n3.2.4 执行完之后需要执行flush privileges;，重新加载数据库。再查询一次：\n12345678910+------------------+---------------+| user             | host          |+------------------+---------------+| myuser           | 46.224.259.19 || debian-sys-maint | localhost     || mysql.session    | localhost     || mysql.sys        | localhost     || root             | localhost     |+------------------+---------------+5 rows in set (0.00 sec)\n\n3.2.5 退出 mysql&gt;quit; 退出mysql登录\n3.2.6 再次查一下3306端口netstat -an | grep 3306\n1tcp6       0      0 :::3306                 :::*                    LISTEN\n\nok\n3.2.6 删除用户: mysql&gt;Delete FROM user Where User=&#39;myuser&#39; and Host=&#39;46.224.259.19&#39;;重新载入flush privileges;\n4.启动数据库4.1 启动服务service mysql start4.2 停止service mysql stop4.3 重启service mysql restart\n5.远程客户的Navicat for MySQL连接数据库主机名或地址：&lt;你的服务器地址&gt;端口：3306 （默认端口）用户名: &lt;mysql添加的用户名&gt;密码：&lt;用户名对应的密码&gt;\n##总结1.需要学习xshell指令，才能更好的操作服务器。2.xftp非常方便使用，文件传输只需拖拽过去即可，上传，没有权限的需要解锁权限。3.操作usr目录需要root权限。4.服务器默认地址为localhost，需要手动修改，添加访问账号。5.Navicat 连接数据库出现“10061”，则是数据库不予许此ip地址访问，需要修改一下远程访问权限。\n\n","dateCreated":"2018-03-17T16:21:37+08:00","dateModified":"2019-04-20T17:10:19+08:00","datePublished":"2018-03-17T16:21:37+08:00","description":"** 基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南：** &lt;Excerpt in index | 首页摘要&gt;腾讯云服务器，配置java后台环境。","headline":"基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"/www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/"},"publisher":{"@type":"Organization","name":"陈哲生","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"/www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/","keywords":"linux"}</script>
+    <title>基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南 | chenzhesheng的博客 | 愿我的只言片语，为你的成长带来帮助！</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="linux">
     <meta name="description" content="** 基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;腾讯云服务器，配置java后台环境。">
 <meta name="keywords" content="linux">
-<meta property="og:type" content="blog">
+<meta property="og:type" content="article">
 <meta property="og:title" content="基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南">
 <meta property="og:url" content="www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/index.html">
 <meta property="og:site_name" content="chenzhesheng的博客">
@@ -27,275 +35,169 @@
 <meta name="twitter:description" content="** 基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;腾讯云服务器，配置java后台环境。">
 <meta name="twitter:image" content="http://blog.zsonchen.cn/wxchat_QR.jpg">
     
-    
-        
-    
-    
-    
-    
-    
-    <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/all.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
-    <!--STYLES END-->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
     
 
-    
-
-    
-        
-    
 </head>
 
-    <body>
-        <div id="blog">
-            <!-- Define author's picture -->
+<body>
+    <div id="loading" class="active"></div>
 
-
-    
-
-<header id="header" data-behavior="4">
-    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
-    <div class="header-title">
-        <a
-            class="header-title-link"
-            href="/ "
-            aria-label=""
-        >
-            chenzhesheng的博客
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
         </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">陈哲生</h5>
+          <a href="mailto:634206017@qq.com" title="634206017@qq.com" class="mail">634206017@qq.com</a>
+        </hgroup>
+      </div>
     </div>
-    
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
         
-            <a
-                class="header-right-picture "
-                href="#about"
-                aria-label="Öffne den Link: /#about"
-            >
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
         
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
         
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/yscoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/ysweb" target="_blank" >
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/custom"  >
+                <i class="icon icon-lg icon-link"></i>
+                测试
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
         </a>
+        <div class="flex-col header-title ellipsis">基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-03-17T08:21:37.000Z" itemprop="datePublished" class="page-time">
+  2018-03-17
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/服务器/">服务器</a></li></ul>
+
+            
+        </h5>
+    </div>
+
     
+
+
 </header>
 
-            <!-- Define author's picture -->
 
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#一、连接服务器。"><span class="post-toc-number">1.</span> <span class="post-toc-text">一、连接服务器。</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-使用xshell连接服务器"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">1.使用xshell连接服务器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-重置root权限密码"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">2.重置root权限密码</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-获取usr用户根目录的权限"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">3.获取usr用户根目录的权限</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#二、配置java环境"><span class="post-toc-number">2.</span> <span class="post-toc-text">二、配置java环境</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-上传解压jdk环境压缩包"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">1.上传解压jdk环境压缩包</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#三、配置tomcat"><span class="post-toc-number">3.</span> <span class="post-toc-text">三、配置tomcat</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#四、配置mysql"><span class="post-toc-number">4.</span> <span class="post-toc-text">四、配置mysql</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-安装mysql"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">1.安装mysql</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-登录mysql数据库"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">2.登录mysql数据库</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-创建远程访问mysql用户"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">3.创建远程访问mysql用户</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#4-启动数据库"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">4.启动数据库</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#5-远程客户的Navicat-for-MySQL连接数据库"><span class="post-toc-number">4.5.</span> <span class="post-toc-text">5.远程客户的Navicat for MySQL连接数据库</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南"
+  class="post-article article-type-post fade" itemprop="blogPost">
 
-<nav id="sidebar" data-behavior="4">
-    <div class="sidebar-container">
-        
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/ "
-                            
-                            title="Home"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Home</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/all-categories"
-                            
-                            title="Kategorien"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Kategorien</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/all-tags"
-                            
-                            title="Tags"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Tags</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/all-archives"
-                            
-                            title="Archiv"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Archiv</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link open-algolia-search"
-                             href="#search"
-                            
-                            title="Suche"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Suche</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="#about"
-                            
-                            title="Über"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Über</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://github.com/" target="_blank" rel="noopener" title="GitHub">
-                    
-                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">GitHub</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
-                    
-                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Stack Overflow</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
-                    
-                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Twitter</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
-                    
-                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google Plus">
-                    
-                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Google Plus</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
-                    
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/mailto"
-                            title="E-Mail"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">E-Mail</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/atom.xml"
-                            
-                            title="RSS"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">RSS</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-    </div>
-</nav>
-
-            
-            <div id="main" data-behavior="4"
-                 class="
-                        hasCoverMetaIn
-                        ">
-                
-<article class="post">
-    
-    
-        <div class="post-header main-content-wrap text-left">
-    
-        <h1 class="post-title">
-            基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南
-        </h1>
-    
-    
+    <div class="post-card">
+        <h1 class="post-card-title">基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南</h1>
         <div class="post-meta">
-    <time datetime="2018-03-17T16:21:37+08:00">
-	
-		    17 Mar 2018
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/服务器/">服务器</a>
+            <time class="post-time" title="2018-03-17 16:21:37" datetime="2018-03-17T08:21:37.000Z"  itemprop="datePublished">2018-03-17</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/服务器/">服务器</a></li></ul>
 
 
-    
-</div>
 
-    
-</div>
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
 
-    
-    <div class="post-content markdown">
-        <div class="main-content-wrap">
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
             <p>** 基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南：** &lt;Excerpt in index | 首页摘要&gt;<br>腾讯云服务器，配置java后台环境。</p>
 <a id="more"></a>
 <p>&lt;The rest of contents | 余下全文&gt;</p>
@@ -361,313 +263,105 @@
 <p>##总结<br>1.需要学习xshell指令，才能更好的操作服务器。<br>2.xftp非常方便使用，文件传输只需拖拽过去即可，上传，没有权限的需要解锁权限。<br>3.操作usr目录需要root权限。<br>4.服务器默认地址为localhost，需要手动修改，添加访问账号。<br>5.Navicat 连接数据库出现“10061”，则是数据库不予许此ip地址访问，需要修改一下远程访问权限。</p>
 <p><img src="http://blog.zsonchen.cn/wxchat_QR.jpg" alt></p>
 
-            
-
-
         </div>
-    </div>
-    <div id="post-footer" class="post-footer main-content-wrap">
-        
-            <div class="post-footer-tags">
-                <span class="text-color-light text-small">GETAGGT IN</span><br/>
-                
-    <a class="tag tag--primary tag--small t-link" href="/tags/linux/">linux</a>
 
-            </div>
+        <blockquote class="post-copyright">
+    <div class="content">
         
+<span class="post-time">
+    最后更新时间：<time datetime="2019-04-20T09:10:19.580Z" itemprop="dateUpdated">2019-04-20 17:10:19</time>
+</span><br>
+
+
         
-            <div class="post-actions-wrap">
-    <nav>
-        <ul class="post-actions post-action-nav">
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2018/03/27/Android触摸事件传递机制/"
-                    data-tooltip="Android触摸事件传递机制"
-                    aria-label="FRÜHER: Android触摸事件传递机制"
-                >
-                    
-                        <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="hide-xs hide-sm text-small icon-ml">FRÜHER</span>
-                    </a>
-            </li>
-            <li class="post-action">
-                
-                    <a
-                        class="post-action-btn btn btn--disabled"
-                        aria-hidden="true"
-                    >
-                        
-                        <span class="hide-xs hide-sm text-small icon-mr">NÄCHSTER</span>
-                        <i class="fa fa-angle-right" aria-hidden="true"></i>
-                    </a>
-            </li>
-        </ul>
-    </nav>
-    <ul class="post-actions post-action-share">
-        <li class="post-action hide-lg hide-md hide-sm">
-            <a
-                class="post-action-btn btn btn--default btn-open-shareoptions"
-                href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
-            >
-                <i class="fa fa-share-alt" aria-hidden="true"></i>
-            </a>
-        </li>
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/" target="_blank" rel="external">www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/</a>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/"
-                    title="Teilen auf Facebook"
-                    aria-label="Teilen auf Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
+    </div>
+    <footer>
+        <a href="www.chenzhesheng.cc">
+            <img src="/img/avatar.jpg" alt="陈哲生">
+            陈哲生
+        </a>
+    </footer>
+</blockquote>
+
         
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
             
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+
+
             
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/"
-                    title="Teilen auf Twitter"
-                    aria-label="Teilen auf Twitter"
-                >
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/"
-                    title="Teilen auf Google Plus"
-                    aria-label="Teilen auf Google Plus"
-                >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-        
-            
-        
-        <li class="post-action">
-            
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
-            
-                <i class="fa fa-list" aria-hidden="true"></i>
-            </a>
-        </li>
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/&title=《基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南》 — chenzhesheng的博客&pic=www.chenzhesheng.cc/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/&title=《基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南》 — chenzhesheng的博客&source=** 基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南：** &lt;Excerpt in index | 首页摘要&g..." data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南》 — chenzhesheng的博客&url=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/&via=www.chenzhesheng.cc" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
     </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
 </div>
 
 
-        
-        
-            
-        
-    </div>
-</article>
 
-
-
-                <footer id="footer" class="main-content-wrap">
-    <span class="copyrights">
-        Copyrights &copy; 2019 陈哲生. All Rights Reserved.
-    </span>
-</footer>
-
-            </div>
-            
-                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-                    <div class="post-actions-wrap">
-    <nav>
-        <ul class="post-actions post-action-nav">
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2018/03/27/Android触摸事件传递机制/"
-                    data-tooltip="Android触摸事件传递机制"
-                    aria-label="FRÜHER: Android触摸事件传递机制"
-                >
-                    
-                        <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="hide-xs hide-sm text-small icon-ml">FRÜHER</span>
-                    </a>
-            </li>
-            <li class="post-action">
-                
-                    <a
-                        class="post-action-btn btn btn--disabled"
-                        aria-hidden="true"
-                    >
-                        
-                        <span class="hide-xs hide-sm text-small icon-mr">NÄCHSTER</span>
-                        <i class="fa fa-angle-right" aria-hidden="true"></i>
-                    </a>
-            </li>
-        </ul>
-    </nav>
-    <ul class="post-actions post-action-share">
-        <li class="post-action hide-lg hide-md hide-sm">
-            <a
-                class="post-action-btn btn btn--default btn-open-shareoptions"
-                href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
-            >
-                <i class="fa fa-share-alt" aria-hidden="true"></i>
-            </a>
-        </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/"
-                    title="Teilen auf Facebook"
-                    aria-label="Teilen auf Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/"
-                    title="Teilen auf Twitter"
-                    aria-label="Teilen auf Twitter"
-                >
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/"
-                    title="Teilen auf Google Plus"
-                    aria-label="Teilen auf Google Plus"
-                >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-        
-            
-        
-        <li class="post-action">
-            
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
-            
-                <i class="fa fa-list" aria-hidden="true"></i>
-            </a>
-        </li>
-    </ul>
-</div>
-
-
-                </div>
-                
-    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-        <i id="btn-close-shareoptions" class="fa fa-times"></i>
-        <ul class="share-options">
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/"
-                        aria-label="Teilen auf Facebook"
-                    >
-                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Teilen auf Facebook</span>
-                    </a>
-                </li>
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://twitter.com/intent/tweet?text=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/"
-                        aria-label="Teilen auf Twitter"
-                    >
-                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Teilen auf Twitter</span>
-                    </a>
-                </li>
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/"
-                        aria-label="Teilen auf Google Plus"
-                    >
-                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Teilen auf Google Plus</span>
-                    </a>
-                </li>
-            
-        </ul>
-    </div>
-
-
-            
         </div>
-        
-
-
-<div id="about">
-    <div id="about-card">
-        <div id="about-btn-close">
-            <i class="fa fa-times"></i>
-        </div>
-        
-            <h4 id="about-card-name">陈哲生</h4>
-        
-            <div id="about-card-bio"><p>author.bio</p>
-</div>
-        
-        
-            <div id="about-card-job">
-                <i class="fa fa-briefcase"></i>
-                <br/>
-                <p>author.job</p>
-
-            </div>
-        
-        
     </div>
-</div>
 
-        
-        
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
-        <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
-<!--SCRIPTS END-->
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2018/03/27/Android触摸事件传递机制/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Android触摸事件传递机制</h4>
+      </a>
+    </div>
+  
+
+  
+</nav>
+
 
 
     
@@ -675,5 +369,183 @@
 
 
 
-    </body>
+
+
+
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/img/wechat.jpg" alt="打赏二维码">
+        </div>
+        
+        <label class="reward-toggle">
+            <input id="rewardToggle" type="checkbox" class="reward-toggle-check"
+                data-wechat="/img/wechat.jpg" data-alipay="/img/alipay.jpg">
+            <div class="reward-toggle-ctrol">
+                <span class="reward-toggle-item wechat">微信</span>
+                <span class="reward-toggle-label"></span>
+                <span class="reward-toggle-item alipay">支付宝</span>
+            </div>
+        </label>
+        
+    </div>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>陈哲生 &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/&title=《基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南》 — chenzhesheng的博客&pic=www.chenzhesheng.cc/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/&title=《基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南》 — chenzhesheng的博客&source=** 基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南：** &lt;Excerpt in index | 首页摘要&g..." data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南》 — chenzhesheng的博客&url=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/&via=www.chenzhesheng.cc" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
 </html>

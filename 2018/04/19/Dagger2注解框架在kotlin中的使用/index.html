@@ -1,20 +1,28 @@
-
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
     
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="chenzhesheng的博客">
-    <title>Dagger2注解框架在kotlin中的使用 - chenzhesheng的博客</title>
-    <meta name="author" content="陈哲生">
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"陈哲生","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"articleBody":"** Dagger2注解框架在kotlin中的使用：** &lt;Excerpt in index | 首页摘要&gt;本文章将会详细介绍 Dagger2 注入神器在kotlin 中的使用，由于Dagger2的概念、理论不是很清晰，我将自身的理解和使用经验写出来分享给大家，希望对大家有帮助。\n\n&lt;The rest of contents | 余下全文&gt;[概述]：无论是在 kotlin 还是在 java 中，使用方法大同小异，希望我的文章能帮助到大家更好的使用Dagger2。Dagger2是编译时依赖注入框架，不使用反射，解决了基于反射的开发与性能的问题。举个例子，在一个类里创建另一个类的实例，高耦合一旦动弹则牵动全身，Dagger2 可以解决这个问题。dagger2是一个依赖注入框架，在编译期间自动生成代码，负责依赖对象的创建。\n一、添加依赖在Module 中的build.gradle 中引入插件，java 使用apt ，kotlin 使用kapt\n1apply plugin: 'kotlin-kapt'\n\n然后在dependencies{} 中引用添加依赖包\n12compile \"com.google.dagger:dagger:2.14.1\" kapt \"com.google.dagger:dagger-compiler:2.14.1\"\n\n二、常用注解 @Inject：注入类实例。\n12345678910111213@Inject lateinit var mPresenter:MainPresenteroverride fun onCreate(savedInstanceState: Bundle?) &#123;     super.onCreate(savedInstanceState)     setContentView(R.layout.activity_main) &#125;class MainPresenter @Inject constructor() &#123;    fun doSomething():String&#123;        return \"This is result\"     &#125; &#125;\n\n使用@Inject 在成员变量和构造方法前面声明，可以不用调用 new classA() 进行实例化。通过注解，自动实例化。\n@Module： 自定义可注入方法的类，方法使用@Provides。\n@Provides：此注解用于标记方法，表示可以通过这个方法获取一个对象，一般用于自定义类中。\n@Component：此注解主要用于关联自定义module类和MainActivity；关联module使用：@Component(modules={UserModule.class})；关联Activity，以方法参数的形式传入MainActivity到连接器中\n@Named与@Qualifier：用于区别不同对象的实例。必须要成对出现，否则会报错。\n@PerActivity：限定对象的生命周期和Activity一样。一般应用于自定义的Component上。\n@Singleton：标记为单例模式，如果在自定义Module中使用了此注解，在自定义的Component上也要使用该注解。\nkapt “com.google.dagger:dagger-compiler:${versions.dagger}”\n关联Activity 与Module：appComponent = DaggerAppComponent.builder().appModule(AppModule(this)).build()AppModule（this）：该module 对象\n\n","dateCreated":"2018-04-19T21:56:53+08:00","dateModified":"2019-04-20T17:16:13+08:00","datePublished":"2018-04-19T21:56:53+08:00","description":"** Dagger2注解框架在kotlin中的使用：** &lt;Excerpt in index | 首页摘要&gt;本文章将会详细介绍 Dagger2 注入神器在kotlin 中的使用，由于Dagger2的概念、理论不是很清晰，我将自身的理解和使用经验写出来分享给大家，希望对大家有帮助。","headline":"Dagger2注解框架在kotlin中的使用","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"/www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/"},"publisher":{"@type":"Organization","name":"陈哲生","sameAs":["https://github.com/","http://stackoverflow.com/users","https://twitter.com/","https://facebook.com/","https://plus.google.com/","https://www.linkedin.com/profile/","mailto"]},"url":"/www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/","keywords":"Android"}</script>
+    <title>Dagger2注解框架在kotlin中的使用 | chenzhesheng的博客 | 愿我的只言片语，为你的成长带来帮助！</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Android">
     <meta name="description" content="** Dagger2注解框架在kotlin中的使用：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;本文章将会详细介绍 Dagger2 注入神器在kotlin 中的使用，由于Dagger2的概念、理论不是很清晰，我将自身的理解和使用经验写出来分享给大家，希望对大家有帮助。">
 <meta name="keywords" content="Android">
-<meta property="og:type" content="blog">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Dagger2注解框架在kotlin中的使用">
 <meta property="og:url" content="www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/index.html">
 <meta property="og:site_name" content="chenzhesheng的博客">
@@ -27,275 +35,169 @@
 <meta name="twitter:description" content="** Dagger2注解框架在kotlin中的使用：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;本文章将会详细介绍 Dagger2 注入神器在kotlin 中的使用，由于Dagger2的概念、理论不是很清晰，我将自身的理解和使用经验写出来分享给大家，希望对大家有帮助。">
 <meta name="twitter:image" content="http://blog.zsonchen.cn/wxchat_QR.jpg">
     
-    
-        
-    
-    
-    
-    
-    
-    <!--STYLES-->
-    <link rel="stylesheet" href="/assets/css/all.css">
-    <link rel="stylesheet" href="/assets/css/jquery.fancybox.css">
-    <link rel="stylesheet" href="/assets/css/thumbs.css">
-    <link rel="stylesheet" href="/assets/css/tranquilpeak.css">
-    <!--STYLES END-->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
     
 
-    
-
-    
-        
-    
 </head>
 
-    <body>
-        <div id="blog">
-            <!-- Define author's picture -->
+<body>
+    <div id="loading" class="active"></div>
 
-
-    
-
-<header id="header" data-behavior="4">
-    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
-    <div class="header-title">
-        <a
-            class="header-title-link"
-            href="/ "
-            aria-label=""
-        >
-            chenzhesheng的博客
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
         </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">陈哲生</h5>
+          <a href="mailto:634206017@qq.com" title="634206017@qq.com" class="mail">634206017@qq.com</a>
+        </hgroup>
+      </div>
     </div>
-    
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
         
-            <a
-                class="header-right-picture "
-                href="#about"
-                aria-label="Öffne den Link: /#about"
-            >
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
         
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
         
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/yscoder" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="http://www.weibo.com/ysweb" target="_blank" >
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/custom"  >
+                <i class="icon icon-lg icon-link"></i>
+                测试
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
         </a>
+        <div class="flex-col header-title ellipsis">Dagger2注解框架在kotlin中的使用</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Dagger2注解框架在kotlin中的使用</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-04-19T13:56:53.000Z" itemprop="datePublished" class="page-time">
+  2018-04-19
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+            
+        </h5>
+    </div>
+
     
+
+
 </header>
 
-            <!-- Define author's picture -->
 
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#一、添加依赖"><span class="post-toc-number">1.</span> <span class="post-toc-text">一、添加依赖</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#二、常用注解"><span class="post-toc-number">2.</span> <span class="post-toc-text">二、常用注解</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Dagger2注解框架在kotlin中的使用"
+  class="post-article article-type-post fade" itemprop="blogPost">
 
-<nav id="sidebar" data-behavior="4">
-    <div class="sidebar-container">
-        
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/ "
-                            
-                            title="Home"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Home</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/all-categories"
-                            
-                            title="Kategorien"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Kategorien</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/all-tags"
-                            
-                            title="Tags"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Tags</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/all-archives"
-                            
-                            title="Archiv"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Archiv</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link open-algolia-search"
-                             href="#search"
-                            
-                            title="Suche"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Suche</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="#about"
-                            
-                            title="Über"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Über</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://github.com/" target="_blank" rel="noopener" title="GitHub">
-                    
-                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">GitHub</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="http://stackoverflow.com/users" target="_blank" rel="noopener" title="Stack Overflow">
-                    
-                        <i class="sidebar-button-icon fab fa-stack-overflow" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Stack Overflow</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://twitter.com/" target="_blank" rel="noopener" title="Twitter">
-                    
-                        <i class="sidebar-button-icon fab fa-twitter" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Twitter</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://facebook.com/" target="_blank" rel="noopener" title="Facebook">
-                    
-                        <i class="sidebar-button-icon fab fa-facebook" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Facebook</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://plus.google.com/" target="_blank" rel="noopener" title="Google Plus">
-                    
-                        <i class="sidebar-button-icon fab fa-google-plus" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Google Plus</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link " href="https://www.linkedin.com/profile/" target="_blank" rel="noopener" title="LinkedIn">
-                    
-                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">LinkedIn</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/mailto"
-                            title="E-Mail"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">E-Mail</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-            <ul class="sidebar-buttons">
-            
-                <li class="sidebar-button">
-                    
-                        <a  class="sidebar-button-link "
-                             href="/atom.xml"
-                            
-                            title="RSS"
-                        >
-                    
-                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">RSS</span>
-                    </a>
-            </li>
-            
-        </ul>
-        
-    </div>
-</nav>
-
-            
-            <div id="main" data-behavior="4"
-                 class="
-                        hasCoverMetaIn
-                        ">
-                
-<article class="post">
-    
-    
-        <div class="post-header main-content-wrap text-left">
-    
-        <h1 class="post-title">
-            Dagger2注解框架在kotlin中的使用
-        </h1>
-    
-    
+    <div class="post-card">
+        <h1 class="post-card-title">Dagger2注解框架在kotlin中的使用</h1>
         <div class="post-meta">
-    <time datetime="2018-04-19T21:56:53+08:00">
-	
-		    19 Apr 2018
-    	
-    </time>
-    
-        <span>in </span>
-        
-    <a class="category-link" href="/categories/Android/">Android</a>
+            <time class="post-time" title="2018-04-19 21:56:53" datetime="2018-04-19T13:56:53.000Z"  itemprop="datePublished">2018-04-19</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
 
 
-    
-</div>
 
-    
-</div>
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
 
-    
-    <div class="post-content markdown">
-        <div class="main-content-wrap">
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
             <p>** Dagger2注解框架在kotlin中的使用：** &lt;Excerpt in index | 首页摘要&gt;<br>本文章将会详细介绍 Dagger2 注入神器在kotlin 中的使用，由于Dagger2的概念、理论不是很清晰，我将自身的理解和使用经验写出来分享给大家，希望对大家有帮助。</p>
 <a id="more"></a>
 <p>&lt;The rest of contents | 余下全文&gt;<br><strong>[概述]</strong>：无论是在 kotlin 还是在 java 中，使用方法大同小异，希望我的文章能帮助到大家更好的使用Dagger2。Dagger2是编译时依赖注入框架，不使用反射，解决了基于反射的开发与性能的问题。举个例子，在一个类里创建另一个类的实例，高耦合一旦动弹则牵动全身，Dagger2 可以解决这个问题。dagger2是一个依赖注入框架，在编译期间自动生成代码，负责依赖对象的创建。</p>
@@ -319,319 +221,112 @@
 <p>关联Activity 与Module：<br>appComponent = DaggerAppComponent.builder().appModule(AppModule(this)).build()<br>AppModule（this）：该module 对象</p>
 <p><img src="http://blog.zsonchen.cn/wxchat_QR.jpg" alt></p>
 
-            
-
-
         </div>
-    </div>
-    <div id="post-footer" class="post-footer main-content-wrap">
-        
-            <div class="post-footer-tags">
-                <span class="text-color-light text-small">GETAGGT IN</span><br/>
-                
-    <a class="tag tag--primary tag--small t-link" href="/tags/Android/">Android</a>
 
-            </div>
+        <blockquote class="post-copyright">
+    <div class="content">
         
+<span class="post-time">
+    最后更新时间：<time datetime="2019-04-20T09:16:13.131Z" itemprop="dateUpdated">2019-04-20 17:16:13</time>
+</span><br>
+
+
         
-            <div class="post-actions-wrap">
-    <nav>
-        <ul class="post-actions post-action-nav">
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/"
-                    data-tooltip="基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统"
-                    aria-label="FRÜHER: 基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统"
-                >
-                    
-                        <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="hide-xs hide-sm text-small icon-ml">FRÜHER</span>
-                    </a>
-            </li>
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2018/03/27/Android触摸事件传递机制/"
-                    data-tooltip="Android触摸事件传递机制"
-                    aria-label="NÄCHSTER: Android触摸事件传递机制"
-                >
-                    
-                        <span class="hide-xs hide-sm text-small icon-mr">NÄCHSTER</span>
-                        <i class="fa fa-angle-right" aria-hidden="true"></i>
-                    </a>
-            </li>
-        </ul>
-    </nav>
-    <ul class="post-actions post-action-share">
-        <li class="post-action hide-lg hide-md hide-sm">
-            <a
-                class="post-action-btn btn btn--default btn-open-shareoptions"
-                href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
-            >
-                <i class="fa fa-share-alt" aria-hidden="true"></i>
-            </a>
-        </li>
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/2018/04/19/Dagger2注解框架在kotlin中的使用/" target="_blank" rel="external">www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/</a>
         
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/"
-                    title="Teilen auf Facebook"
-                    aria-label="Teilen auf Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
+    </div>
+    <footer>
+        <a href="www.chenzhesheng.cc">
+            <img src="/img/avatar.jpg" alt="陈哲生">
+            陈哲生
+        </a>
+    </footer>
+</blockquote>
+
         
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
             
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li></ul>
+
+
             
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/"
-                    title="Teilen auf Twitter"
-                    aria-label="Teilen auf Twitter"
-                >
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/"
-                    title="Teilen auf Google Plus"
-                    aria-label="Teilen auf Google Plus"
-                >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-        
-            
-        
-        <li class="post-action">
-            
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
-            
-                <i class="fa fa-list" aria-hidden="true"></i>
-            </a>
-        </li>
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/&title=《Dagger2注解框架在kotlin中的使用》 — chenzhesheng的博客&pic=www.chenzhesheng.cc/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/&title=《Dagger2注解框架在kotlin中的使用》 — chenzhesheng的博客&source=** Dagger2注解框架在kotlin中的使用：** &lt;Excerpt in index | 首页摘要&gt;本文章将会详细介绍 Dagger2..." data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Dagger2注解框架在kotlin中的使用》 — chenzhesheng的博客&url=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/&via=www.chenzhesheng.cc" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
     </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
 </div>
 
 
-        
-        
-            
-        
-    </div>
-</article>
 
-
-
-                <footer id="footer" class="main-content-wrap">
-    <span class="copyrights">
-        Copyrights &copy; 2019 陈哲生. All Rights Reserved.
-    </span>
-</footer>
-
-            </div>
-            
-                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
-                    <div class="post-actions-wrap">
-    <nav>
-        <ul class="post-actions post-action-nav">
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/"
-                    data-tooltip="基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统"
-                    aria-label="FRÜHER: 基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统"
-                >
-                    
-                        <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="hide-xs hide-sm text-small icon-ml">FRÜHER</span>
-                    </a>
-            </li>
-            <li class="post-action">
-                
-                    
-                <a
-                    class="post-action-btn btn btn--default tooltip--top"
-                    href="/2018/03/27/Android触摸事件传递机制/"
-                    data-tooltip="Android触摸事件传递机制"
-                    aria-label="NÄCHSTER: Android触摸事件传递机制"
-                >
-                    
-                        <span class="hide-xs hide-sm text-small icon-mr">NÄCHSTER</span>
-                        <i class="fa fa-angle-right" aria-hidden="true"></i>
-                    </a>
-            </li>
-        </ul>
-    </nav>
-    <ul class="post-actions post-action-share">
-        <li class="post-action hide-lg hide-md hide-sm">
-            <a
-                class="post-action-btn btn btn--default btn-open-shareoptions"
-                href="#btn-open-shareoptions"
-                aria-label="Diesen Beitrag teilen"
-            >
-                <i class="fa fa-share-alt" aria-hidden="true"></i>
-            </a>
-        </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/"
-                    title="Teilen auf Facebook"
-                    aria-label="Teilen auf Facebook"
-                >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/"
-                    title="Teilen auf Twitter"
-                    aria-label="Teilen auf Twitter"
-                >
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-            
-            
-            <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/"
-                    title="Teilen auf Google Plus"
-                    aria-label="Teilen auf Google Plus"
-                >
-                    <i class="fab fa-google-plus" aria-hidden="true"></i>
-                </a>
-            </li>
-        
-        
-            
-        
-        <li class="post-action">
-            
-                <a class="post-action-btn btn btn--default" href="#" aria-label="Nach oben">
-            
-                <i class="fa fa-list" aria-hidden="true"></i>
-            </a>
-        </li>
-    </ul>
-</div>
-
-
-                </div>
-                
-    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
-        <i id="btn-close-shareoptions" class="fa fa-times"></i>
-        <ul class="share-options">
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/"
-                        aria-label="Teilen auf Facebook"
-                    >
-                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Teilen auf Facebook</span>
-                    </a>
-                </li>
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://twitter.com/intent/tweet?text=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/"
-                        aria-label="Teilen auf Twitter"
-                    >
-                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Teilen auf Twitter</span>
-                    </a>
-                </li>
-            
-                
-                
-                <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/"
-                        aria-label="Teilen auf Google Plus"
-                    >
-                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Teilen auf Google Plus</span>
-                    </a>
-                </li>
-            
-        </ul>
-    </div>
-
-
-            
         </div>
-        
-
-
-<div id="about">
-    <div id="about-card">
-        <div id="about-btn-close">
-            <i class="fa fa-times"></i>
-        </div>
-        
-            <h4 id="about-card-name">陈哲生</h4>
-        
-            <div id="about-card-bio"><p>author.bio</p>
-</div>
-        
-        
-            <div id="about-card-job">
-                <i class="fa fa-briefcase"></i>
-                <br/>
-                <p>author.job</p>
-
-            </div>
-        
-        
     </div>
-</div>
 
-        
-        
-<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
-        <!--SCRIPTS-->
-<script src="/assets/js/jquery.js"></script>
-<script src="/assets/js/jquery.fancybox.js"></script>
-<script src="/assets/js/thumbs.js"></script>
-<script src="/assets/js/tranquilpeak.js"></script>
-<!--SCRIPTS END-->
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2018/03/27/Android触摸事件传递机制/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Android触摸事件传递机制</h4>
+      </a>
+    </div>
+  
+</nav>
+
 
 
     
@@ -639,5 +334,183 @@
 
 
 
-    </body>
+
+
+
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/img/wechat.jpg" alt="打赏二维码">
+        </div>
+        
+        <label class="reward-toggle">
+            <input id="rewardToggle" type="checkbox" class="reward-toggle-check"
+                data-wechat="/img/wechat.jpg" data-alipay="/img/alipay.jpg">
+            <div class="reward-toggle-ctrol">
+                <span class="reward-toggle-item wechat">微信</span>
+                <span class="reward-toggle-label"></span>
+                <span class="reward-toggle-item alipay">支付宝</span>
+            </div>
+        </label>
+        
+    </div>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>陈哲生 &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/&title=《Dagger2注解框架在kotlin中的使用》 — chenzhesheng的博客&pic=www.chenzhesheng.cc/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/&title=《Dagger2注解框架在kotlin中的使用》 — chenzhesheng的博客&source=** Dagger2注解框架在kotlin中的使用：** &lt;Excerpt in index | 首页摘要&gt;本文章将会详细介绍 Dagger2..." data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Dagger2注解框架在kotlin中的使用》 — chenzhesheng的博客&url=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/&via=www.chenzhesheng.cc" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=www.chenzhesheng.cc/2018/04/19/Dagger2注解框架在kotlin中的使用/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
 </html>
