@@ -10,21 +10,21 @@
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta name="description" content="** Android触摸事件传递机制：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
+  <meta name="description" content="本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
 <meta name="keywords" content="Android">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android触摸事件传递机制">
-<meta property="og:url" content="www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/index.html">
+<meta property="og:url" content="www.chenzhesheng.cc/2019/07/01/Android触摸事件传递机制/index.html">
 <meta property="og:site_name" content="chenzhesheng的博客">
-<meta property="og:description" content="** Android触摸事件传递机制：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
+<meta property="og:description" content="本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E7%9A%84%E4%BC%A0%E9%80%92.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
 <meta property="og:image" content="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E3%80%81ViewGroup%E3%80%81Activity.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
 <meta property="og:image" content="http://blog.zsonchen.cn/wxchat_QR.jpg">
-<meta property="og:updated_time" content="2019-04-20T09:19:32.342Z">
+<meta property="og:updated_time" content="2019-12-24T04:28:52.616Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android触摸事件传递机制">
-<meta name="twitter:description" content="** Android触摸事件传递机制：** &amp;lt;Excerpt in index | 首页摘要&amp;gt;本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
+<meta name="twitter:description" content="本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
 <meta name="twitter:image" content="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E7%9A%84%E4%BC%A0%E9%80%92.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
   
     <link rel="alternative" href="/atom.xml" title="chenzhesheng的博客" type="application/atom+xml">
@@ -226,8 +226,8 @@ var _hmt = _hmt || [];
               <i class="icon-smile icon"></i> 阅读数：<span id="busuanzi_value_page_pv"></span>次
         </span>
 
-<a href="/2018/03/27/Android触摸事件传递机制/" class="archive-article-date">
-        <time datetime="2018-03-27T11:05:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-27</time>
+<a href="/2019/07/01/Android触摸事件传递机制/" class="archive-article-date">
+        <time datetime="2019-07-01T02:06:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-01</time>
 </a>
 
   
@@ -240,7 +240,7 @@ var _hmt = _hmt || [];
       <!-- 百度字体平台:http://fontstore.baidu.com/static/editor/index.html -->
       <i class="icon-statistics"></i>
       <span class="post-meta-item-text"> 字数统计:</span>
-      <span class="post-count">2.2k字</span>
+      <span class="post-count">2.1k字</span>
     </span>
   </span>
 
@@ -260,10 +260,8 @@ var _hmt = _hmt || [];
   
   <div class="article-entry" itemprop="articleBody">
     
-    <p>** Android触摸事件传递机制：** &lt;Excerpt in index | 首页摘要&gt;<br>本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</p>
-<a id="more"></a>
-<p>&lt;The rest of contents | 余下全文&gt;<br>    前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</p>
-<h2 id="一-触摸事件的类型"><a href="#一-触摸事件的类型" class="headerlink" title="一.触摸事件的类型"></a>一.触摸事件的类型</h2><p>触摸事件对应的是 <strong>MotionEvent</strong> 类，事件类型主要有三种：</p>
+    <a id="more"></a>
+<pre><code>前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</code></pre><h2 id="一-触摸事件的类型"><a href="#一-触摸事件的类型" class="headerlink" title="一.触摸事件的类型"></a>一.触摸事件的类型</h2><p>触摸事件对应的是 <strong>MotionEvent</strong> 类，事件类型主要有三种：</p>
 <ol>
 <li>ACTION_DOWN：用户按下操作，表示一次触摸事件的开始。 </li>
 <li>ACTION_MOVE：在按下的情况下，进行移动。轻微的移动都会传递到该事件。</li>
@@ -375,7 +373,7 @@ var _hmt = _hmt || [];
         </li>
         <li>
           <strong>本文链接：</strong>
-          <a href="www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/" title="Android触摸事件传递机制" target="_blank">www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/</a>
+          <a href="www.chenzhesheng.cc/2019/07/01/Android触摸事件传递机制/" title="Android触摸事件传递机制" target="_blank">www.chenzhesheng.cc/2019/07/01/Android触摸事件传递机制/</a>
         </li>
         <li>
           <strong>版权声明： </strong>
@@ -401,17 +399,6 @@ var _hmt = _hmt || [];
 	</div>
 
     
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android//" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
 
     
 
@@ -461,7 +448,7 @@ var _hmt = _hmt || [];
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-     <!-- <img src="//pan.baidu.com/share/qrcode?url=http:www.chenzhesheng.cc/2018/03/27/Android触摸事件传递机制/" alt="微信分享二维码"> -->
+     <!-- <img src="//pan.baidu.com/share/qrcode?url=http:www.chenzhesheng.cc/2019/07/01/Android触摸事件传递机制/" alt="微信分享二维码"> -->
     </div>
 </div>
 
@@ -476,18 +463,9 @@ var _hmt = _hmt || [];
 
 <nav id="article-nav">
   
-    <a href="/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统
-        
-      </div>
-    </a>
   
-  
-    <a href="/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南</div>
+    <a href="/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -543,7 +521,7 @@ var _hmt = _hmt || [];
   <script>
     <!-- id: "Android触摸事件传递机制" -->
     var gitment = new Gitment({
-      id: "20180327190551",
+      id: "20190701100600",
       owner: 'chenzhesheng',
       repo: 'chenzhesheng.github.io\blog',
       oauth: {
