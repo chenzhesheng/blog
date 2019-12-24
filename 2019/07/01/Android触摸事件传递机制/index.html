@@ -10,21 +10,21 @@
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta name="description" content="本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。 前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶">
+  <meta name="description" content="前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
 <meta name="keywords" content="Android">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android触摸事件传递机制">
 <meta property="og:url" content="www.chenzhesheng.cc/2019/07/01/Android触摸事件传递机制/index.html">
 <meta property="og:site_name" content="chenzhesheng的博客">
-<meta property="og:description" content="本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。 前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶">
+<meta property="og:description" content="前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E7%9A%84%E4%BC%A0%E9%80%92.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
 <meta property="og:image" content="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E3%80%81ViewGroup%E3%80%81Activity.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
 <meta property="og:image" content="http://blog.zsonchen.cn/wxchat_QR.jpg">
-<meta property="og:updated_time" content="2019-12-24T08:08:04.843Z">
+<meta property="og:updated_time" content="2019-12-24T08:53:28.495Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android触摸事件传递机制">
-<meta name="twitter:description" content="本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。 前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶">
+<meta name="twitter:description" content="前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
 <meta name="twitter:image" content="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E7%9A%84%E4%BC%A0%E9%80%92.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
   
     <link rel="alternative" href="/atom.xml" title="chenzhesheng的博客" type="application/atom+xml">
@@ -260,9 +260,9 @@ var _hmt = _hmt || [];
   
   <div class="article-entry" itemprop="articleBody">
     
-    <p>本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</p>
-<pre><code>前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</code></pre><a id="more"></a>
-
+    <p>前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</p>
+<a id="more"></a>
+<p>本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</p>
 <h2 id="一-触摸事件的类型"><a href="#一-触摸事件的类型" class="headerlink" title="一.触摸事件的类型"></a>一.触摸事件的类型</h2><p>触摸事件对应的是 <strong>MotionEvent</strong> 类，事件类型主要有三种：</p>
 <ol>
 <li>ACTION_DOWN：用户按下操作，表示一次触摸事件的开始。 </li>

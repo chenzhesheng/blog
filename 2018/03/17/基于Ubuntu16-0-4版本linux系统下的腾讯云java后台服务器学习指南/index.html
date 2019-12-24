@@ -10,19 +10,19 @@
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta name="description" content="腾讯云服务器，配置java后台环境。 前言：本人于2018年03月06日购买了腾讯云服务器，用于java后台使用。由于是第一次使用，于是乎有了这篇文章。文章将直接跳过购买部分，来到配置java和后台环境部分。">
+  <meta name="description" content="前言：本人于2018年03月06日购买了腾讯云服务器，用于java后台使用。由于是第一次使用，于是乎有了这篇文章。文章将直接跳过购买部分，来到配置java和后台环境部分。">
 <meta name="keywords" content="linux">
 <meta property="og:type" content="article">
 <meta property="og:title" content="基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南">
 <meta property="og:url" content="www.chenzhesheng.cc/2018/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/index.html">
 <meta property="og:site_name" content="chenzhesheng的博客">
-<meta property="og:description" content="腾讯云服务器，配置java后台环境。 前言：本人于2018年03月06日购买了腾讯云服务器，用于java后台使用。由于是第一次使用，于是乎有了这篇文章。文章将直接跳过购买部分，来到配置java和后台环境部分。">
+<meta property="og:description" content="前言：本人于2018年03月06日购买了腾讯云服务器，用于java后台使用。由于是第一次使用，于是乎有了这篇文章。文章将直接跳过购买部分，来到配置java和后台环境部分。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://blog.zsonchen.cn/wxchat_QR.jpg">
-<meta property="og:updated_time" content="2019-12-24T08:08:08.237Z">
+<meta property="og:updated_time" content="2019-12-24T08:53:16.082Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南">
-<meta name="twitter:description" content="腾讯云服务器，配置java后台环境。 前言：本人于2018年03月06日购买了腾讯云服务器，用于java后台使用。由于是第一次使用，于是乎有了这篇文章。文章将直接跳过购买部分，来到配置java和后台环境部分。">
+<meta name="twitter:description" content="前言：本人于2018年03月06日购买了腾讯云服务器，用于java后台使用。由于是第一次使用，于是乎有了这篇文章。文章将直接跳过购买部分，来到配置java和后台环境部分。">
 <meta name="twitter:image" content="http://blog.zsonchen.cn/wxchat_QR.jpg">
   
     <link rel="alternative" href="/atom.xml" title="chenzhesheng的博客" type="application/atom+xml">
@@ -238,7 +238,7 @@ var _hmt = _hmt || [];
       <!-- 百度字体平台:http://fontstore.baidu.com/static/editor/index.html -->
       <i class="icon-statistics"></i>
       <span class="post-meta-item-text"> 字数统计:</span>
-      <span class="post-count">1.7k字</span>
+      <span class="post-count">1.6k字</span>
     </span>
   </span>
 
@@ -258,8 +258,8 @@ var _hmt = _hmt || [];
   
   <div class="article-entry" itemprop="articleBody">
     
-    <p>腾讯云服务器，配置java后台环境。</p>
-<pre><code>前言：本人于2018年03月06日购买了腾讯云服务器，用于java后台使用。由于是第一次使用，于是乎有了这篇文章。文章将直接跳过购买部分，来到配置java和后台环境部分。</code></pre><a id="more"></a>
+    <p>前言：本人于2018年03月06日购买了腾讯云服务器，用于java后台使用。由于是第一次使用，于是乎有了这篇文章。文章将直接跳过购买部分，来到配置java和后台环境部分。</p>
+<a id="more"></a>
 
 <p>使用工具：xshell、xftp<br>xshell：可连接远程服务器，使用命令操作远程服务器<br>xftp：用来向服务器传输文件</p>
 <h2 id="一、连接服务器。"><a href="#一、连接服务器。" class="headerlink" title="一、连接服务器。"></a>一、连接服务器。</h2><h3 id="1-使用xshell连接服务器"><a href="#1-使用xshell连接服务器" class="headerlink" title="1.使用xshell连接服务器"></a>1.使用xshell连接服务器</h3><p>在腾讯云的管理页面找到购买的主机，设置用户名和密码，还有记住公网ip跟端口号。</p>
