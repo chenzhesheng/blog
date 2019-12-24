@@ -6,26 +6,28 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="www.chenzhesheng.cc">
-  <title>基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南 | chenzhesheng的博客</title>
+  <title>Android触摸事件传递机制 | chenzhesheng</title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta name="description" content="前言：本人于2018年03月06日购买了腾讯云服务器，用于java后台使用。由于是第一次使用，于是乎有了这篇文章。文章将直接跳过购买部分，来到配置java和后台环境部分。">
-<meta name="keywords" content="linux">
+  <meta name="description" content="前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
+<meta name="keywords" content="Android">
 <meta property="og:type" content="article">
-<meta property="og:title" content="基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南">
-<meta property="og:url" content="www.chenzhesheng.cc/year/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/index.html">
-<meta property="og:site_name" content="chenzhesheng的博客">
-<meta property="og:description" content="前言：本人于2018年03月06日购买了腾讯云服务器，用于java后台使用。由于是第一次使用，于是乎有了这篇文章。文章将直接跳过购买部分，来到配置java和后台环境部分。">
+<meta property="og:title" content="Android触摸事件传递机制">
+<meta property="og:url" content="www.chenzhesheng.cc/2019/07/01/Android触摸事件传递机制/index.html">
+<meta property="og:site_name" content="chenzhesheng">
+<meta property="og:description" content="前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E7%9A%84%E4%BC%A0%E9%80%92.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
+<meta property="og:image" content="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E3%80%81ViewGroup%E3%80%81Activity.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
 <meta property="og:image" content="http://blog.zsonchen.cn/wxchat_QR.jpg">
-<meta property="og:updated_time" content="2019-12-24T08:53:16.082Z">
+<meta property="og:updated_time" content="2019-12-24T08:53:28.495Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南">
-<meta name="twitter:description" content="前言：本人于2018年03月06日购买了腾讯云服务器，用于java后台使用。由于是第一次使用，于是乎有了这篇文章。文章将直接跳过购买部分，来到配置java和后台环境部分。">
-<meta name="twitter:image" content="http://blog.zsonchen.cn/wxchat_QR.jpg">
+<meta name="twitter:title" content="Android触摸事件传递机制">
+<meta name="twitter:description" content="前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
+<meta name="twitter:image" content="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E7%9A%84%E4%BC%A0%E9%80%92.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
   
-    <link rel="alternative" href="/atom.xml" title="chenzhesheng的博客" type="application/atom+xml">
+    <link rel="alternative" href="/atom.xml" title="chenzhesheng" type="application/atom+xml">
   
   
     <link rel="icon" href="/img/favicon.png">
@@ -88,15 +90,15 @@ var _hmt = _hmt || [];
 		<nav class="header-menu">
 			<ul>
 			
-				<li><a href="/" >主页</a></li>
+				<li><a href="/" target="_blank">主页</a></li>
 	        
-				<li><a href="/archives" >所有文章</a></li>
+				<li><a href="/archives" target="_blank">所有文章</a></li>
 	        
-				<li><a href="/Android" >Android</a></li>
+				<li><a href="/tags/Android/" target="_blank">Android</a></li>
 	        
-				<li><a href="/linux" >linux</a></li>
+				<li><a href="/tags/linux/" target="_blank">Linux</a></li>
 	        
-				<li><a href="/about" >关于我</a></li>
+				<li><a href="/about" target="_blank">关于我</a></li>
 	        
 			</ul>
 		</nav>
@@ -118,11 +120,11 @@ var _hmt = _hmt || [];
 		<nav class="header-nav">
 			<div class="social">
 				
-					<a class="mail" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=&#99;&#122;&#115;&#112;&#114;&#105;&#118;&#97;&#116;&#101;&#109;&#97;&#105;&#108;&#64;&#115;&#105;&#110;&#97;&#46;&#99;&#111;&#109;" title="NULL" ><i class="icon-mail"></i></a>
+					<a class="mail" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=&#99;&#122;&#115;&#112;&#114;&#105;&#118;&#97;&#116;&#101;&#109;&#97;&#105;&#108;&#64;&#115;&#105;&#110;&#97;&#46;&#99;&#111;&#109;" title="NULL" target="_blank"><i class="icon-mail"></i></a>
 		        
-					<a class="github" href="https://github.com/chenzhesheng" title="GitHub" ><i class="icon-github"></i></a>
+					<a class="github" href="https://github.com/chenzhesheng" title="GitHub" target="_blank"><i class="icon-github"></i></a>
 		        
-					<a class="rss" href="/atom.xml" title="RSS订阅" ><i class="icon-rss"></i></a>
+					<a class="rss" href="/atom.xml" title="RSS订阅" target="_blank"><i class="icon-rss"></i></a>
 		        
 			</div>
 		
@@ -191,9 +193,9 @@ var _hmt = _hmt || [];
 		        
 					<li style="width: 20%"><a href="/archives">所有文章</a></li>
 		        
-					<li style="width: 20%"><a href="/Android">Android</a></li>
+					<li style="width: 20%"><a href="/tags/Android/">Android</a></li>
 		        
-					<li style="width: 20%"><a href="/linux">linux</a></li>
+					<li style="width: 20%"><a href="/tags/linux/">Linux</a></li>
 		        
 					<li style="width: 20%"><a href="/about">关于我</a></li>
 		        
@@ -211,14 +213,14 @@ var _hmt = _hmt || [];
               class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-Android触摸事件传递机制" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
   
   
     <h1 class="article-title" itemprop="name">
-      基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南
+      Android触摸事件传递机制
     </h1>
   
 
@@ -230,8 +232,8 @@ var _hmt = _hmt || [];
               <i class="icon-smile icon"></i> 阅读数：<span id="busuanzi_value_page_pv"></span>次
         </span>
 
-<a href="/year/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/" class="archive-article-date">
-        <time datetime="2018-03-17T08:21:37.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-17</time>
+<a href="/2019/07/01/Android触摸事件传递机制/" class="archive-article-date">
+        <time datetime="2019-07-01T02:06:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-01</time>
 </a>
 
   
@@ -244,7 +246,7 @@ var _hmt = _hmt || [];
       <!-- 百度字体平台:http://fontstore.baidu.com/static/editor/index.html -->
       <i class="icon-statistics"></i>
       <span class="post-meta-item-text"> 字数统计:</span>
-      <span class="post-count">1.6k字</span>
+      <span class="post-count">2.2k字</span>
     </span>
   </span>
 
@@ -253,7 +255,7 @@ var _hmt = _hmt || [];
     <span class="post-meta-item-icon">
       <i class="icon-book icon"></i>
       <span class="post-meta-item-text"> 阅读时长≈</span>
-      <span class="post-count">7分</span>
+      <span class="post-count">10分</span>
     </span>
   </span>
 </div>
@@ -264,69 +266,73 @@ var _hmt = _hmt || [];
   
   <div class="article-entry" itemprop="articleBody">
     
-    <p>前言：本人于2018年03月06日购买了腾讯云服务器，用于java后台使用。由于是第一次使用，于是乎有了这篇文章。文章将直接跳过购买部分，来到配置java和后台环境部分。</p>
+    <p>前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</p>
 <a id="more"></a>
+<p>本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</p>
+<h2 id="一-触摸事件的类型"><a href="#一-触摸事件的类型" class="headerlink" title="一.触摸事件的类型"></a>一.触摸事件的类型</h2><p>触摸事件对应的是 <strong>MotionEvent</strong> 类，事件类型主要有三种：</p>
+<ol>
+<li>ACTION_DOWN：用户按下操作，表示一次触摸事件的开始。 </li>
+<li>ACTION_MOVE：在按下的情况下，进行移动。轻微的移动都会传递到该事件。</li>
+<li>ACTION_UP：用户手指离开屏幕，表示一次触摸事件的<br>注 ：如果用户仅仅的是点击而已，则只会执行到 ACTION_DOWN 和 ACTION_UP 两个事件，不会执行到 ACTION_MOVE 事件。所以 ACTION_DOWN 和 ACTION_UP 是事件是必须的。</li>
+</ol>
+<h2 id="二-触摸事件的传递阶段"><a href="#二-触摸事件的传递阶段" class="headerlink" title="二.触摸事件的传递阶段"></a>二.触摸事件的传递阶段</h2><h3 id="1-分发（Dispatch）"><a href="#1-分发（Dispatch）" class="headerlink" title="1.分发（Dispatch）"></a>1.分发（Dispatch）</h3><p>在Android系统中所有的触摸事件都是由 <strong>dispatchTouchEvent</strong>  方法进行分发的。该方法中判断事件是被消费（<strong>return true</strong>），还是继续分发给子视图处理（<strong>return super.dispatchTouchEvent</strong>），如果当前视图是ViewGroup或者其子类，则会调用<strong>onInterceptTouchEvent</strong> 判断是否截拦。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public boolean dispatchTouchEvent(MotionEvent event) &#123;</span><br><span class="line">    <span class="built_in">return</span> super.dispatchTouchEvent(event);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>使用工具：xshell、xftp<br>xshell：可连接远程服务器，使用命令操作远程服务器<br>xftp：用来向服务器传输文件</p>
-<h2 id="一、连接服务器。"><a href="#一、连接服务器。" class="headerlink" title="一、连接服务器。"></a>一、连接服务器。</h2><h3 id="1-使用xshell连接服务器"><a href="#1-使用xshell连接服务器" class="headerlink" title="1.使用xshell连接服务器"></a>1.使用xshell连接服务器</h3><p>在腾讯云的管理页面找到购买的主机，设置用户名和密码，还有记住公网ip跟端口号。</p>
-<p>打开xshell，输入服务器地址与端口号，点击连接，首次进入需输入用户名密码，这些在腾讯云后台可看到，记住密码则不用每次进入都输入。</p>
-<h3 id="2-重置root权限密码"><a href="#2-重置root权限密码" class="headerlink" title="2.重置root权限密码"></a>2.重置root权限密码</h3><p>进入界面后，输入：<br><code>sudo passwd</code><br>输入新密码 + 回车 * 3次</p>
-<h3 id="3-获取usr用户根目录的权限"><a href="#3-获取usr用户根目录的权限" class="headerlink" title="3.获取usr用户根目录的权限"></a>3.获取usr用户根目录的权限</h3><p>root指令<br><code>su root</code><br>输入root密码 + 回车</p>
-<h2 id="二、配置java环境"><a href="#二、配置java环境" class="headerlink" title="二、配置java环境"></a>二、配置java环境</h2><h3 id="1-上传解压jdk环境压缩包"><a href="#1-上传解压jdk环境压缩包" class="headerlink" title="1.上传解压jdk环境压缩包"></a>1.上传解压jdk环境压缩包</h3><p>1.1 创建java目录：<br><code>mkdir /usr/local/java</code></p>
-<p>1.2 在<a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html" target="_blank" rel="noopener">jdk官网</a>下载好linux对应系统位数的安装包，使用xftp上传到服务器，shell指令复制到/usr/local/java目录下</p>
-<p>1.3 使用cd进入到目录下解压<br><code>sudo tar xvf jdk-8u121-linux-x64.tar.gz</code></p>
-<p>1.4 删除原压缩包<br><code>sudo rm jdk-8u121-linux-x64.tar.gz</code></p>
-<p>###2.更改环境变量<br>2.1 使用vim打开.bashrc环境配置文件<br><code>sudo vim ~/.bashrc</code></p>
-<p>2.2 在文件结尾添加（注意文件夹名字要匹配好jdk版本号）：<br><code>export JAVA_HOME=/usr/local/java/jdk1.8.0_161</code><br><code>export JRE_HOME=${JAVA_HOME}/jre</code><br><code>export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib</code><br><code>export PATH=${JAVA_HOME}/bin:$PATH</code></p>
-<p>2.3 保存并退出,输入<code>:wq</code>回车</p>
-<p>2.4 应用环境配置<br><code>source ~/.bashrc</code></p>
-<p>2.5 检验java环境是否配置好<br><code>java -version</code><br>返回：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">java version <span class="string">"1.8.0_161"</span></span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_161-b12)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.161-b12, mixed mode)</span><br></pre></td></tr></table></figure>
+<h3 id="2-截拦（Intercept）"><a href="#2-截拦（Intercept）" class="headerlink" title="2.截拦（Intercept）"></a>2.截拦（Intercept）</h3><p>事件的截拦 <strong>InterceptTouchEvent</strong>  只存在于ViewGroup及其子类，activity和View是不存在该方法。该方法判断事件是被截拦 （<strong>return true</strong>）并交给自身的 <strong>OnToucEvent</strong> 方法进行消费，还是继续传递给子视图（<strong>return super.InterceptTouchEvent</strong> 或者 <strong>return false</strong>）。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public boolean onInterceptTouchEvent(MotionEvent ev) &#123;</span><br><span class="line">    <span class="built_in">return</span> super.onInterceptTouchEvent(ev);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>2.6 如果出现没有权限 Permission is not allowed,需要手动修改目录权限<br><code>chmod 777 &lt;文件夹名&gt;</code></p>
-<h2 id="三、配置tomcat"><a href="#三、配置tomcat" class="headerlink" title="三、配置tomcat"></a>三、配置tomcat</h2><p>###1.下载解压安装包<br>1.1 <a href="http://tomcat.apache.org/" target="_blank" rel="noopener">tomcat官网</a>下载apache-tomcat-7.0.78.tar.gz </p>
-<p>1.2 解压安装包<br><code>tar -zxvf apache-tomcat-7.0.78.tar.gz</code></p>
-<p>1.3 删除安装包<br><code>sudo rm apache-tomcat-7.0.78.tar.gz</code></p>
-<p>###2.修改启动器<br>2.1 修改startup.sh 启动文件<br><code>cd apche-tomcat-7.0.78/bin</code><br><code>sudo vim startup.sh</code></p>
-<p>2.2 在esac下面添加：<br><code>JAVA_HOME=/usr/local/java/jdk1.8.0_161</code><br><code>JRE_HOME=/usr/local/java/jdk1.8.0_161/jre</code><br><code>PATH=$JAVA_HOME/bin:$JRE_HOME:$PATH</code><br><code>CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar</code><br><code>TOMCAT_HOME=/home/ubuntu/apache-tomcat-7.0.78</code></p>
-<p>2.3 保存退出：<code>:wq</code></p>
-<p>2.4 启动tomcat<br><code>sudo ./startup.sh</code><br>返回</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Using CATALINA_BASE:   /home/ubuntu/apache-tomcat-7.0.85</span><br><span class="line">Using CATALINA_HOME:   /home/ubuntu/apache-tomcat-7.0.85</span><br><span class="line">Using CATALINA_TMPDIR: /home/ubuntu/apache-tomcat-7.0.85/temp</span><br><span class="line">Using JRE_HOME:        /usr/<span class="built_in">local</span>/java/jdk1.8.0_161</span><br><span class="line">Using CLASSPATH:       /home/ubuntu/apache-tomcat-7.0.85/bin/bootstrap.jar:/home/ubuntu/apache-tomcat-   7.0.85/bin/tomcat-juli.jar</span><br><span class="line">Tomcat started.</span><br></pre></td></tr></table></figure>
+<h3 id="3-消费（Consume）"><a href="#3-消费（Consume）" class="headerlink" title="3.消费（Consume）"></a>3.消费（Consume）</h3><p>事件的消费通过 <strong>OnTouchEvent</strong> 方法判断，是被消费（<strong>return true</strong>）,还是不处理（<strong>return false</strong>）并将事件传递给父视图的 <strong>OnTouchEvent</strong> 方法进行处理。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public boolean onTouchEvent(MotionEvent event) &#123;</span><br><span class="line">    <span class="built_in">return</span> super.onTouchEvent(event);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>2.5 检查<br>在浏览器输入localhost:8080，可以看到tomcat首页界面。</p>
-<p>2.6 关闭tomcat<br><code>sudo ./shutdown.sh</code></p>
-<p>若是关闭tomcat出现</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Neither the JAVA_HOME nor the JRE_HOME environment variable is defined</span><br><span class="line">At least one of these environment variable is needed to run this program</span><br></pre></td></tr></table></figure>
+<p>所有拥有事件传递能力的类：<br>Activity： 拥有dispatchTouchEvent 、OnTouchEvent<br>ViewGroup： 拥有dispatchTouchEvent 、OnInterceptTouchEvent 、OnTouchEvent<br>View：拥有dispatchTouchEvent 、OnTouchEvent</p>
+<h2 id="三、View的事件传递机制"><a href="#三、View的事件传递机制" class="headerlink" title="三、View的事件传递机制"></a>三、View的事件传递机制</h2><h3 id="3-1-dome"><a href="#3-1-dome" class="headerlink" title="3.1 dome"></a>3.1 dome</h3><p>虽然说ViewGroup是View的子类，但是这是说的View指的是除ViewGroup之外的View控件子类，首先定义一个MyTextView继承TextView，打印每次事件的触发以变了解事件传递的流程。</p>
+<p>MyTextView 类</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">public class MyTextView extends TextView &#123;</span><br><span class="line"></span><br><span class="line">    private String tag = <span class="string">"MyTextView"</span>;</span><br><span class="line"></span><br><span class="line">    public MyTextView(Context context) &#123;</span><br><span class="line">        super(context);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public MyTextView(Context context, AttributeSet attrs) &#123;</span><br><span class="line">        super(context, attrs);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public boolean dispatchTouchEvent(MotionEvent event) &#123;</span><br><span class="line">        switch (event.getAction())&#123;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_UP:</span><br><span class="line">                Log.i(tag, <span class="string">"dispatchTouchEvent ACTION_UP"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_MOVE:</span><br><span class="line">                Log.i(tag, <span class="string">"dispatchTouchEvent ACTION_MOVE"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_DOWN:</span><br><span class="line">                Log.i(tag, <span class="string">"dispatchTouchEvent ACTION_DOWN"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">return</span> super.dispatchTouchEvent(event);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public boolean onTouchEvent(MotionEvent event) &#123;</span><br><span class="line">        switch (event.getAction())&#123;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_UP:</span><br><span class="line">                Log.i(tag, <span class="string">"onTouchEvent ACTION_UP"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_MOVE:</span><br><span class="line">                Log.i(tag, <span class="string">"onTouchEvent ACTION_MOVE"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_DOWN:</span><br><span class="line">                Log.i(tag, <span class="string">"onTouchEvent ACTION_DOWN"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">return</span> super.onTouchEvent(event);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>因为tomcat无法识别到环境变量，则需修改setclasspath.sh文件<br><code>sudo vim setclasspath.sh</code></p>
-<p>由于无法识别java_home和jre_home的环境变量，需要我们手动在文件头添加。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">JAVA_HOME=/usr/<span class="built_in">local</span>/java/jdk1.8.0_161</span><br><span class="line">JRE_HOME=/usr/<span class="built_in">local</span>/java/jdk1.8.0_161/jre</span><br></pre></td></tr></table></figure>
+<hr>
+<p>定义一个MainActivity来展现这个MyTextView，同时设置点击（onClick）和触摸（onTouch）监听。<br>MainActivity 类</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line">public class MainActivity extends AppCompatActivity implements View.OnClickListener,View.OnTouchListener&#123;</span><br><span class="line">    private MyTextView mMyTextView;</span><br><span class="line">    private String tag = <span class="string">"MainActiviy"</span>;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line">        super.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line"></span><br><span class="line">        mMyTextView = findViewById(R.id.text_view);</span><br><span class="line">        //  点击监听</span><br><span class="line">        mMyTextView.setOnClickListener(this);</span><br><span class="line">        //  触碰监听</span><br><span class="line">        mMyTextView.setOnTouchListener(this);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    // MyTextView 点击事件</span><br><span class="line">    @Override</span><br><span class="line">    public void onClick(View view) &#123;</span><br><span class="line">        switch (view.getId())&#123;</span><br><span class="line">            <span class="keyword">case</span> R.id.text_view:</span><br><span class="line">                Log.i(tag, <span class="string">"MyTextView onClick"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // MyTextView 触碰事件</span><br><span class="line">    @Override</span><br><span class="line">    public boolean onTouch(View view, MotionEvent motionEvent) &#123;</span><br><span class="line">        switch (motionEvent.getAction())&#123;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_UP:</span><br><span class="line">                Log.i(tag, <span class="string">"MyTextView onTouch ACTION_UP"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_MOVE:</span><br><span class="line">                Log.i(tag, <span class="string">"MyTextView onTouch ACTION_MOVE"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_DOWN:</span><br><span class="line">                Log.i(tag, <span class="string">"MyTextView onTouch ACTION_DOWN"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // Activity　的事件分发</span><br><span class="line">    @Override</span><br><span class="line">    public boolean dispatchTouchEvent(MotionEvent ev) &#123;</span><br><span class="line">        switch (ev.getAction())&#123;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_UP:</span><br><span class="line">                Log.i(tag, <span class="string">"dispatchTouchEvent ACTION_UP"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_MOVE:</span><br><span class="line">                Log.i(tag, <span class="string">"dispatchTouchEvent ACTION_MOVE"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_DOWN:</span><br><span class="line">                Log.i(tag, <span class="string">"dispatchTouchEvent ACTION_DOWN"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">return</span> super.dispatchTouchEvent(ev);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // Activity 的事件消费</span><br><span class="line">    @Override</span><br><span class="line">    public boolean onTouchEvent(MotionEvent event) &#123;</span><br><span class="line">        switch (event.getAction())&#123;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_UP:</span><br><span class="line">                Log.i(tag, <span class="string">"onTouchEvent ACTION_UP"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_MOVE:</span><br><span class="line">                Log.i(tag, <span class="string">"onTouchEvent ACTION_MOVE"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_DOWN:</span><br><span class="line">                Log.i(tag, <span class="string">"onTouchEvent ACTION_DOWN"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">return</span> super.onTouchEvent(event);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>可以正常关闭tomcat，则说明修改完成。</p>
-<h2 id="四、配置mysql"><a href="#四、配置mysql" class="headerlink" title="四、配置mysql"></a>四、配置mysql</h2><h3 id="1-安装mysql"><a href="#1-安装mysql" class="headerlink" title="1.安装mysql"></a>1.安装mysql</h3><p>1.1 linux安装mysql环境很简单，只需逐步执行以下指令即可。<br><code>sudo apt-get install mysql-server</code> 期间需要设置密码<br><code>apt-get isntall mysql-client</code><br><code>sudo apt-get install libmysqlclient-dev</code></p>
-<p>1.2 检查<br>查看3306端口是否正常<br><code>netstat -an | grep 3306</code><br>如果处于listen则表示安装成功</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN</span><br></pre></td></tr></table></figure>
+<h3 id="3-2-打印日志"><a href="#3-2-打印日志" class="headerlink" title="3.2 打印日志"></a>3.2 打印日志</h3><p>运行后，点击Text View反馈的打印日志</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">03-28 08:05:14.824 1219-1219/com.mvp.chenzhesheng.androidadvance I/MainActiviy: dispatchTouchEvent ACTION_DOWN</span><br><span class="line">03-28 08:05:14.824 1219-1219/com.mvp.chenzhesheng.androidadvance I/MyTextView: dispatchTouchEvent ACTION_DOWN</span><br><span class="line">03-28 08:05:14.824 1219-1219/com.mvp.chenzhesheng.androidadvance I/MainActiviy: MyTextView onTouch ACTION_DOWN</span><br><span class="line">03-28 08:05:14.824 1219-1219/com.mvp.chenzhesheng.androidadvance I/MyTextView: onTouchEvent ACTION_DOWN</span><br><span class="line">03-28 08:05:15.034 1219-1219/com.mvp.chenzhesheng.androidadvance I/MainActiviy: dispatchTouchEvent ACTION_UP</span><br><span class="line">03-28 08:05:15.034 1219-1219/com.mvp.chenzhesheng.androidadvance I/MyTextView: dispatchTouchEvent ACTION_UP</span><br><span class="line">03-28 08:05:15.034 1219-1219/com.mvp.chenzhesheng.androidadvance I/MainActiviy: MyTextView onTouch ACTION_UP</span><br><span class="line">03-28 08:05:15.034 1219-1219/com.mvp.chenzhesheng.androidadvance I/MyTextView: onTouchEvent ACTION_UP</span><br><span class="line">03-28 08:05:15.044 1219-1219/com.mvp.chenzhesheng.androidadvance I/MainActiviy: MyTextView onClick</span><br></pre></td></tr></table></figure>
 
-<h3 id="2-登录mysql数据库"><a href="#2-登录mysql数据库" class="headerlink" title="2.登录mysql数据库"></a>2.登录mysql数据库</h3><p><code>mysql -u root -p</code><br>选择登录 -u 用户名为 root 输入密码 -p<br>此时输入密码就可以登录mysql</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Welcome to the MySQL monitor.  Commands end with ; or \g.</span><br><span class="line">Your MySQL connection id is 1705</span><br><span class="line">Server version: 5.7.21-0ubuntu0.16.04.1 (Ubuntu)</span><br><span class="line"></span><br><span class="line">Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.</span><br><span class="line"></span><br><span class="line">Oracle is a registered trademark of Oracle Corporation and/or its</span><br><span class="line">affiliates. Other names may be trademarks of their respective</span><br><span class="line">owners.</span><br><span class="line"></span><br><span class="line">Type <span class="string">'help;'</span> or <span class="string">'\h'</span> <span class="keyword">for</span> <span class="built_in">help</span>. Type <span class="string">'\c'</span> to clear the current input statement.</span><br><span class="line"></span><br><span class="line">mysql&gt;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>dispatchTouchEvent 、 OnTouchEvent 这两个方法的返回值存在三种情况：</p>
+<ol>
+<li>直接返回true。</li>
+<li>直接返回false。</li>
+<li>返回父类同名方法，super.dispatchTouchEvent 或者 super.OnTouchEvent。</li>
+</ol>
+<p>由于拥有不同的返回值，所以事件传递流程也有不同，经过不断修改返回值测试，最终得到了点击事件的流程图，ACTION_DOWN 和 ACTION_UP 事件的传递流程是相同的。</p>
+<h3 id="3-3-事件传递流程图"><a href="#3-3-事件传递流程图" class="headerlink" title="3.3 事件传递流程图"></a>3.3 事件传递流程图</h3><p><img src="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E7%9A%84%E4%BC%A0%E9%80%92.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30" alt><br>从上面的流程图可以得出结论：</p>
+<ol>
+<li>触摸事件是从 <strong>dispatchTouchEvent</strong>  开始的，默认返回父类同名方法 <strong>super</strong> ，事件将会依照嵌套层次从外向内传递（ <strong>MainActivity</strong> 到 <strong>MyTextView</strong> ），到达最内层的 <strong>View</strong> 时，将由 <strong>View</strong> 的 <strong>OnTouchEvent</strong>  方法处理，该方法返回 <strong>true</strong> 时进行消费不再传递，返回 <strong>false</strong> 时再由内向外传递，由外层的 <strong>OnTouchEvent</strong> 处理。</li>
+<li>如果外层向内层传递过程中，人为干扰返回 <strong>true</strong> 消费，则不会继续继续像内部传递。</li>
+<li><strong>View</strong> 的事件控制顺序先执行 <strong>onTouch</strong> 再执行 <strong>onClick</strong> ，如果 <strong>onTouch</strong> 返回 <strong>true</strong> 消费，则不会继续传递，也不会执行 <strong>onClick</strong> 方法。</li>
+</ol>
+<h2 id="四、ViewGroup的事件传递机制"><a href="#四、ViewGroup的事件传递机制" class="headerlink" title="四、ViewGroup的事件传递机制"></a>四、ViewGroup的事件传递机制</h2><h3 id="4-1-dome"><a href="#4-1-dome" class="headerlink" title="4.1 dome"></a>4.1 dome</h3><p><strong>ViewGroup</strong> 是 <strong>View</strong> 的控件容器存在，拥有 <strong>dispatchTouchEvent</strong> 、 <strong>onInterceptTouchEvent</strong> 和 <strong>onTouchEvent</strong> 三个方法，比 <strong>View</strong> 多了一个 <strong>onInterceptTouchEvent</strong> 方法。为了更好的观察，我们需要自定义 <strong>MyRelativeLayout</strong> 继承 <strong>RelativeLayout</strong> 。</p>
+<p>MyRelativeLayout类</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">public class MyRelativeLayout extends RelativeLayout &#123;</span><br><span class="line"></span><br><span class="line">    private final static String tag = <span class="string">"MyRelativeLayout"</span>;</span><br><span class="line"></span><br><span class="line">    public MyRelativeLayout(Context context) &#123;</span><br><span class="line">        super(context);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public MyRelativeLayout(Context context, AttributeSet attrs) &#123;</span><br><span class="line">        super(context, attrs);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public boolean dispatchTouchEvent(MotionEvent ev) &#123;</span><br><span class="line">        switch (ev.getAction())&#123;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_UP:</span><br><span class="line">                Log.i(tag, <span class="string">"dispatchTouchEvent ACTION_UP"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_MOVE:</span><br><span class="line">                Log.i(tag, <span class="string">"dispatchTouchEvent ACTION_MOVE"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_DOWN:</span><br><span class="line">                Log.i(tag, <span class="string">"dispatchTouchEvent ACTION_DOWN"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">return</span> super.dispatchTouchEvent(ev);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public boolean onInterceptTouchEvent(MotionEvent ev) &#123;</span><br><span class="line">        switch (ev.getAction())&#123;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_UP:</span><br><span class="line">                Log.i(tag, <span class="string">"onInterceptTouchEvent ACTION_UP"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_MOVE:</span><br><span class="line">                Log.i(tag, <span class="string">"onInterceptTouchEvent ACTION_MOVE"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_DOWN:</span><br><span class="line">                Log.i(tag, <span class="string">"onInterceptTouchEvent ACTION_DOWN"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">return</span> super.onInterceptTouchEvent(ev);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public boolean onTouchEvent(MotionEvent event) &#123;</span><br><span class="line">        switch (event.getAction())&#123;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_UP:</span><br><span class="line">                Log.i(tag, <span class="string">"onTouchEvent ACTION_UP"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_MOVE:</span><br><span class="line">                Log.i(tag, <span class="string">"onTouchEvent ACTION_MOVE"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">            <span class="keyword">case</span> MotionEvent.ACTION_DOWN:</span><br><span class="line">                Log.i(tag, <span class="string">"onTouchEvent ACTION_DOWN"</span>);</span><br><span class="line">                <span class="built_in">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">return</span> super.onTouchEvent(event);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h3 id="3-创建远程访问mysql用户"><a href="#3-创建远程访问mysql用户" class="headerlink" title="3.创建远程访问mysql用户"></a>3.创建远程访问mysql用户</h3><p>3.1 查询表<br>显示当前的数据库<br><code>show databases;</code><br>显示当前数据库的表单<br><code>show tables;</code></p>
-<p>3.2 远程访问用户<br>mysql默认是本机127.0.0.1访问数据库，想要远程访问需要开放mysql服务器并创建新的用户来访问mysql。</p>
-<p>3.2.1 开放服务器修改配置文件：<br>mysql5.7以下的的配置文件在/etc/mysql/my.cnf文件内，里面有一行<code>bind-address = 127.0.0.1</code>表示只允许本地访问，将它注释掉。<br>mysql5.7版本或以上的配置文件在在/etc/mysql/mysql.conf.d目录下的mysqld.cnf文件</p>
-<p>3.2.2 创建新用户赋予远程ip访问权限：<br>查询mysql的用户表<br><code>select user,authentication_string,host from mysql.user;</code></p>
-<p>3.2.3 创建新用户<br><code>grant all privileges on *.* to &#39;myuser&#39; @&#39;46.224.259.19&#39; identified by &#39;password&#39; with grant option;</code><br>创建用户myuser使用password从ip 46.224.259.19连接到mysql服务器<br>当然，ip 地址处可以修改为 ‘%’，指任意ip地址，实际环境不予许，<strong>慎用</strong>。</p>
-<p>3.2.4 执行完之后需要执行<code>flush privileges;</code>，重新加载数据库。<br>再查询一次：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">+------------------+---------------+</span><br><span class="line">| user             | host          |</span><br><span class="line">+------------------+---------------+</span><br><span class="line">| myuser           | 46.224.259.19 |</span><br><span class="line">| debian-sys-maint | localhost     |</span><br><span class="line">| mysql.session    | localhost     |</span><br><span class="line">| mysql.sys        | localhost     |</span><br><span class="line">| root             | localhost     |</span><br><span class="line">+------------------+---------------+</span><br><span class="line">5 rows <span class="keyword">in</span> <span class="built_in">set</span> (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p>main_activity.xml 文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"utf-8"</span>?&gt;</span><br><span class="line">&lt;com.mvp.chenzhesheng.androidadvance.MyRelativeLayout</span><br><span class="line">    xmlns:android=<span class="string">"http://schemas.android.com/apk/res/android"</span></span><br><span class="line">    xmlns:tools=<span class="string">"http://schemas.android.com/tools"</span></span><br><span class="line">    android:layout_width=<span class="string">"match_parent"</span></span><br><span class="line">    android:layout_height=<span class="string">"match_parent"</span></span><br><span class="line">    &gt;</span><br><span class="line"></span><br><span class="line">    &lt;com.mvp.chenzhesheng.androidadvance.MyTextView</span><br><span class="line">        android:id=<span class="string">"@+id/text_view"</span></span><br><span class="line">        android:clickable=<span class="string">"true"</span></span><br><span class="line">        android:layout_width=<span class="string">"wrap_content"</span></span><br><span class="line">        android:layout_height=<span class="string">"wrap_content"</span></span><br><span class="line">        android:text=<span class="string">"Hello World!"</span></span><br><span class="line"></span><br><span class="line">&lt;/com.mvp.chenzhesheng.androidadvance.MyRelativeLayout&gt;</span><br></pre></td></tr></table></figure>
 
-<p>3.2.5 退出<br> <code>mysql&gt;quit;</code> 退出mysql登录</p>
-<p>3.2.6 再次查一下3306端口<br><code>netstat -an | grep 3306</code></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcp6       0      0 :::3306                 :::*                    LISTEN</span><br></pre></td></tr></table></figure>
+<h3 id="4-2-打印日志"><a href="#4-2-打印日志" class="headerlink" title="4.2 打印日志"></a>4.2 打印日志</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">04-02 08:47:57.980 1030-1030/com.mvp.chenzhesheng.androidadvance I/MainActiviy: dispatchTouchEvent ACTION_DOWN</span><br><span class="line">04-02 08:47:58.000 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyRelativeLayout: dispatchTouchEvent ACTION_DOWN</span><br><span class="line">04-02 08:47:58.000 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyRelativeLayout: onInterceptTouchEvent ACTION_DOWN</span><br><span class="line">04-02 08:47:58.000 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyTextView: dispatchTouchEvent ACTION_DOWN</span><br><span class="line">04-02 08:47:58.010 1030-1030/com.mvp.chenzhesheng.androidadvance I/MainActiviy: MyTextView onTouch ACTION_DOWN</span><br><span class="line">04-02 08:47:58.010 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyTextView: onTouchEvent ACTION_DOWN</span><br><span class="line">04-02 08:47:58.200 1030-1030/com.mvp.chenzhesheng.androidadvance I/MainActiviy: dispatchTouchEvent ACTION_UP</span><br><span class="line">04-02 08:47:58.200 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyRelativeLayout: dispatchTouchEvent ACTION_UP</span><br><span class="line">04-02 08:47:58.200 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyRelativeLayout: onInterceptTouchEvent ACTION_UP</span><br><span class="line">04-02 08:47:58.200 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyTextView: dispatchTouchEvent ACTION_UP</span><br><span class="line">04-02 08:47:58.210 1030-1030/com.mvp.chenzhesheng.androidadvance I/MainActiviy: MyTextView onTouch ACTION_UP</span><br><span class="line">04-02 08:47:58.210 1030-1030/com.mvp.chenzhesheng.androidadvance I/MyTextView: onTouchEvent ACTION_UP</span><br><span class="line">04-02 08:47:58.260 1030-1030/com.mvp.chenzhesheng.androidadvance I/MainActiviy: MyTextView onClick</span><br></pre></td></tr></table></figure>
 
-<p>ok</p>
-<p>3.2.6 删除用户: <code>mysql&gt;Delete FROM user Where User=&#39;myuser&#39; and Host=&#39;46.224.259.19&#39;;</code><br>重新载入<code>flush privileges;</code></p>
-<h3 id="4-启动数据库"><a href="#4-启动数据库" class="headerlink" title="4.启动数据库"></a>4.启动数据库</h3><p>4.1 启动服务<br><code>service mysql start</code><br>4.2 停止<br><code>service mysql stop</code><br>4.3 重启<br><code>service mysql restart</code></p>
-<h3 id="5-远程客户的Navicat-for-MySQL连接数据库"><a href="#5-远程客户的Navicat-for-MySQL连接数据库" class="headerlink" title="5.远程客户的Navicat for MySQL连接数据库"></a>5.远程客户的Navicat for MySQL连接数据库</h3><p>主机名或地址：&lt;你的服务器地址&gt;<br>端口：3306 （默认端口）<br>用户名: &lt;mysql添加的用户名&gt;<br>密码：&lt;用户名对应的密码&gt;</p>
-<p>##总结<br>1.需要学习xshell指令，才能更好的操作服务器。<br>2.xftp非常方便使用，文件传输只需拖拽过去即可，上传，没有权限的需要解锁权限。<br>3.操作usr目录需要root权限。<br>4.服务器默认地址为localhost，需要手动修改，添加访问账号。<br>5.Navicat 连接数据库出现“10061”，则是数据库不予许此ip地址访问，需要修改一下远程访问权限。</p>
+<hr>
+<p>可以看到 <strong>MainActivity</strong> 和 <strong>MyTextView</strong> 的事件传递处理中添加了一层 <strong>MyRelativeLayout</strong> 。通过不同返回值测试，得到一套流程图。</p>
+<h3 id="4-3-流程图"><a href="#4-3-流程图" class="headerlink" title="4.3 流程图"></a>4.3 流程图</h3><p><img src="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E3%80%81ViewGroup%E3%80%81Activity.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30" alt><br>从上面的流程图可以得出结论：</p>
+<ol>
+<li>触摸事件传递是从 <strong>Activity</strong> 传递到 <strong>ViewGroup</strong> ,再传递到 <strong>View</strong> 。如果中间没有 <strong>ViewGroup</strong> 则直接从 <strong>Activity</strong> 传递到 <strong>View</strong> 。</li>
+<li><strong>ViewGroup</strong> 通过 <strong>onInterceptTouchEvent</strong> 方法对事件进行截拦，如果返回 <strong>false</strong> 或者 <strong>super.onInterceptTouchEvent</strong> ，则事件会继续传递给子 <strong>View</strong> 。</li>
+<li>子 <strong>View</strong> 中对事件进行消费后，<strong>ViewGroup</strong> 将不会接收到任何事件。</li>
+</ol>
+<h2 id="五-总结"><a href="#五-总结" class="headerlink" title="五.总结"></a>五.总结</h2><ol>
+<li>事件分发是由外到内，从 <strong>Activity</strong> 到具体的子 <strong>View</strong> ；</li>
+<li>事件处理消费是由内到外，从子 <strong>View</strong> 到最外层 <strong>Activity</strong> ；</li>
+<li>事件拦截只存在于 <strong>ViewGroup</strong> 中；</li>
+<li>掌握事件传递机制可以更好的进行事件处理，无论是自定义 <strong>View</strong> 还是阅读 <strong>Framework</strong> 层源码都需要对事件传递进行学习，才能更精致的开发应用。</li>
+</ol>
 <p><img src="http://blog.zsonchen.cn/wxchat_QR.jpg" alt></p>
 
     
@@ -374,7 +380,7 @@ var _hmt = _hmt || [];
         </li>
         <li>
           <strong>本文链接：</strong>
-          <a href="www.chenzhesheng.cc/year/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/" title="基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南" target="_blank">www.chenzhesheng.cc/year/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/</a>
+          <a href="www.chenzhesheng.cc/2019/07/01/Android触摸事件传递机制/" title="Android触摸事件传递机制" target="_blank">www.chenzhesheng.cc/2019/07/01/Android触摸事件传递机制/</a>
         </li>
         <li>
           <strong>版权声明： </strong>
@@ -393,7 +399,7 @@ var _hmt = _hmt || [];
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">linux</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
         		</li>
       		
 		</ul>
@@ -405,7 +411,7 @@ var _hmt = _hmt || [];
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/服务器//" class="article-tag-list-link color4">服务器</a>
+        			<a href="/categories/Android//" class="article-tag-list-link color3">Android</a>
         		</li>
       		
 		</ul>
@@ -460,7 +466,7 @@ var _hmt = _hmt || [];
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-     <!-- <img src="//pan.baidu.com/share/qrcode?url=http:www.chenzhesheng.cc/year/03/17/基于Ubuntu16-0-4版本linux系统下的腾讯云java后台服务器学习指南/" alt="微信分享二维码"> -->
+     <!-- <img src="//pan.baidu.com/share/qrcode?url=http:www.chenzhesheng.cc/2019/07/01/Android触摸事件传递机制/" alt="微信分享二维码"> -->
     </div>
 </div>
 
@@ -475,15 +481,11 @@ var _hmt = _hmt || [];
 
 <nav id="article-nav">
   
-    <a href="/year/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统
-        
-      </div>
-    </a>
   
+    <a href="/2019/01/30/基于vmvare12虚拟机CentOS 7系统下搭建SVN/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">基于vmvare12虚拟机CentOS 7系统下搭建SVN版本控制系统</div>
+      <i class="icon-circle-right"></i>
+    </a>
   
 </nav>
 
@@ -508,7 +510,7 @@ var _hmt = _hmt || [];
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、连接服务器。"><span class="toc-number">1.</span> <span class="toc-text">一、连接服务器。</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-使用xshell连接服务器"><span class="toc-number">1.1.</span> <span class="toc-text">1.使用xshell连接服务器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-重置root权限密码"><span class="toc-number">1.2.</span> <span class="toc-text">2.重置root权限密码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-获取usr用户根目录的权限"><span class="toc-number">1.3.</span> <span class="toc-text">3.获取usr用户根目录的权限</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、配置java环境"><span class="toc-number">2.</span> <span class="toc-text">二、配置java环境</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-上传解压jdk环境压缩包"><span class="toc-number">2.1.</span> <span class="toc-text">1.上传解压jdk环境压缩包</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、配置tomcat"><span class="toc-number">3.</span> <span class="toc-text">三、配置tomcat</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、配置mysql"><span class="toc-number">4.</span> <span class="toc-text">四、配置mysql</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-安装mysql"><span class="toc-number">4.1.</span> <span class="toc-text">1.安装mysql</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-登录mysql数据库"><span class="toc-number">4.2.</span> <span class="toc-text">2.登录mysql数据库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-创建远程访问mysql用户"><span class="toc-number">4.3.</span> <span class="toc-text">3.创建远程访问mysql用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-启动数据库"><span class="toc-number">4.4.</span> <span class="toc-text">4.启动数据库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-远程客户的Navicat-for-MySQL连接数据库"><span class="toc-number">4.5.</span> <span class="toc-text">5.远程客户的Navicat for MySQL连接数据库</span></a></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一-触摸事件的类型"><span class="toc-number">1.</span> <span class="toc-text">一.触摸事件的类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二-触摸事件的传递阶段"><span class="toc-number">2.</span> <span class="toc-text">二.触摸事件的传递阶段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-分发（Dispatch）"><span class="toc-number">2.1.</span> <span class="toc-text">1.分发（Dispatch）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-截拦（Intercept）"><span class="toc-number">2.2.</span> <span class="toc-text">2.截拦（Intercept）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-消费（Consume）"><span class="toc-number">2.3.</span> <span class="toc-text">3.消费（Consume）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、View的事件传递机制"><span class="toc-number">3.</span> <span class="toc-text">三、View的事件传递机制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-dome"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 dome</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-打印日志"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 打印日志</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-事件传递流程图"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 事件传递流程图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、ViewGroup的事件传递机制"><span class="toc-number">4.</span> <span class="toc-text">四、ViewGroup的事件传递机制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-dome"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 dome</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-打印日志"><span class="toc-number">4.2.</span> <span class="toc-text">4.2 打印日志</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-流程图"><span class="toc-number">4.3.</span> <span class="toc-text">4.3 流程图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#五-总结"><span class="toc-number">5.</span> <span class="toc-text">五.总结</span></a></li></ol>
                     </div>
                 </span>
             </div>
@@ -535,9 +537,9 @@ var _hmt = _hmt || [];
     <script src="/lib/gitment.js"></script>
   
   <script>
-    <!-- id: "基于Ubuntu16.0.4版本linux系统下的腾讯云java后台服务器学习指南" -->
+    <!-- id: "Android触摸事件传递机制" -->
     var gitment = new Gitment({
-      id: "20180317162137",
+      id: "20190701100600",
       owner: 'chenzhesheng',
       repo: 'chenzhesheng.github.io\blog',
       oauth: {
@@ -595,7 +597,7 @@ var _hmt = _hmt || [];
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
-		open_in_new: false,
+		open_in_new: true,
 		toc_hide_index: true,
 		root: "/",
 		innerArchive: true,
@@ -735,7 +737,7 @@ var _hmt = _hmt || [];
         <ul class="search-ul">
           
             <li class="search-li">
-              <a href="http://chenzhesheng.cc" target="_blank" class="search-title" title="记录工作和学习过程中的笔记：Java、前端开发、Hexo博客、聚合支付、Linux笔记、ElasticSearch、ELK日志分析">
+              <a href="http://chenzhesheng.cc" target="_blank" class="search-title" >
                 
                   <img src="https://zhousiwei.gitee.io/ibooks/favicon.ico">
                 
@@ -837,6 +839,35 @@ var _hmt = _hmt || [];
   </div>
 
   
+<script type="text/javascript" src="/plugins/TweenMax/TweenMax.min.js"></script>
+<script type="text/javascript" src="/plugins/TweenMax/HoverImg.js"></script>
+
+<script>
+
+
+  var hoverEffect = {
+    "subNav": ".left-col .social a"
+  }
+
+
+  for (var x in hoverEffect) {
+    // 初始化data-img属性值
+    let $em = document.querySelectorAll(hoverEffect[x]);
+    $em.forEach(($a) => {
+      //console.log($a.href);
+      if (isImageType($a.href)) {
+        $a.setAttribute("data-img", $a.href)
+      }
+    })
+    // 实现悬停元素预览图片效果
+    let $a = document.querySelectorAll(hoverEffect[x] + "[data-img]");
+    $a.forEach(($em) => {
+      new HoverImgFx1($em)
+    })
+  }
+
+</script>
+
   
 <script type="text/javascript" src="/plugins/activate-power-mode/activate-power-mode.js"></script>
 <script>
@@ -899,16 +930,6 @@ var _hmt = _hmt || [];
 </script>
 
   
-  
-  <script type="text/javascript" src="/lib/snow.js"></script>
-  <script type="text/javascript" src="/lib/jquery-2.1.4.min.js"></script>
-  <script>
-    snow.down();
-    $(window).resize(function() {
-      $("canvas").css("z-index","500").remove();
-      snow.down();
-    });
-  </script>
   
 </body>
 
