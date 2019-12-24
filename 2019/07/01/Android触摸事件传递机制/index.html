@@ -10,21 +10,21 @@
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta name="description" content="本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
+  <meta name="description" content="本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。 &amp;lt;The rest of contents | 余下全文&amp;gt;    前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Act">
 <meta name="keywords" content="Android">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android触摸事件传递机制">
 <meta property="og:url" content="www.chenzhesheng.cc/2019/07/01/Android触摸事件传递机制/index.html">
 <meta property="og:site_name" content="chenzhesheng的博客">
-<meta property="og:description" content="本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
+<meta property="og:description" content="本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。 &amp;lt;The rest of contents | 余下全文&amp;gt;    前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Act">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E7%9A%84%E4%BC%A0%E9%80%92.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
 <meta property="og:image" content="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E3%80%81ViewGroup%E3%80%81Activity.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
 <meta property="og:image" content="http://blog.zsonchen.cn/wxchat_QR.jpg">
-<meta property="og:updated_time" content="2019-12-24T05:36:26.182Z">
+<meta property="og:updated_time" content="2019-12-24T05:38:33.852Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android触摸事件传递机制">
-<meta name="twitter:description" content="本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。">
+<meta name="twitter:description" content="本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。 &amp;lt;The rest of contents | 余下全文&amp;gt;    前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Act">
 <meta name="twitter:image" content="http://blog.zsonchen.cn/android%E8%A7%A6%E6%91%B8%E4%BA%8B%E4%BB%B6View%E7%9A%84%E4%BC%A0%E9%80%92.jpg?imageView2/0/q/100%7Cwatermark/2/text/5YWs5LyX5Y-377ya5oqA5pyv5bCP5L2c5Z2K/font/5a6L5L2T/fontsize/480/fill/I0JEQjdCNw==/dissolve/50/gravity/SouthEast/dx/30/dy/30">
   
     <link rel="alternative" href="/atom.xml" title="chenzhesheng的博客" type="application/atom+xml">
@@ -261,15 +261,14 @@ var _hmt = _hmt || [];
   <div class="article-entry" itemprop="articleBody">
     
     <p>本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</p>
-<a id="more"></a>
 <p>&lt;The rest of contents | 余下全文&gt;<br>    前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</p>
 <h2 id="一-触摸事件的类型"><a href="#一-触摸事件的类型" class="headerlink" title="一.触摸事件的类型"></a>一.触摸事件的类型</h2><p>触摸事件对应的是 <strong>MotionEvent</strong> 类，事件类型主要有三种：</p>
 <ol>
 <li>ACTION_DOWN：用户按下操作，表示一次触摸事件的开始。 </li>
 <li>ACTION_MOVE：在按下的情况下，进行移动。轻微的移动都会传递到该事件。</li>
-<li>ACTION_UP：用户手指离开屏幕，表示一次触摸事件的</li>
+<li>ACTION_UP：用户手指离开屏幕，表示一次触摸事件的<a id="more"></a>
+注 ：如果用户仅仅的是点击而已，则只会执行到 ACTION_DOWN 和 ACTION_UP 两个事件，不会执行到 ACTION_MOVE 事件。所以 ACTION_DOWN 和 ACTION_UP 是事件是必须的。</li>
 </ol>
-<p>注 ：如果用户仅仅的是点击而已，则只会执行到 ACTION_DOWN 和 ACTION_UP 两个事件，不会执行到 ACTION_MOVE 事件。所以 ACTION_DOWN 和 ACTION_UP 是事件是必须的。</p>
 <h2 id="二-触摸事件的传递阶段"><a href="#二-触摸事件的传递阶段" class="headerlink" title="二.触摸事件的传递阶段"></a>二.触摸事件的传递阶段</h2><h3 id="1-分发（Dispatch）"><a href="#1-分发（Dispatch）" class="headerlink" title="1.分发（Dispatch）"></a>1.分发（Dispatch）</h3><p>在Android系统中所有的触摸事件都是由 <strong>dispatchTouchEvent</strong>  方法进行分发的。该方法中判断事件是被消费（<strong>return true</strong>），还是继续分发给子视图处理（<strong>return super.dispatchTouchEvent</strong>），如果当前视图是ViewGroup或者其子类，则会调用<strong>onInterceptTouchEvent</strong> 判断是否截拦。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public boolean dispatchTouchEvent(MotionEvent event) &#123;</span><br><span class="line">    <span class="built_in">return</span> super.dispatchTouchEvent(event);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 

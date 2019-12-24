@@ -237,6 +237,12 @@ var _hmt = _hmt || [];
   <div class="article-entry" itemprop="articleBody">
     
     <p>本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</p>
+<p>&lt;The rest of contents | 余下全文&gt;<br>    前言：在Android开发中，经常会遇到触摸事件冲突，比如ViewPager的轮播图跟Fragment的划动事件冲突，或者轮播图跟下拉事件冲突，自定义view的事件处理等，本文章将会详细介绍Activity、View、ViewGroup三者的触摸事件传递机制，传递包括三个阶段：分发、拦截、消费。</p>
+<h2 id="一-触摸事件的类型"><a href="#一-触摸事件的类型" class="headerlink" title="一.触摸事件的类型"></a>一.触摸事件的类型</h2><p>触摸事件对应的是 <strong>MotionEvent</strong> 类，事件类型主要有三种：</p>
+<ol>
+<li>ACTION_DOWN：用户按下操作，表示一次触摸事件的开始。 </li>
+<li>ACTION_MOVE：在按下的情况下，进行移动。轻微的移动都会传递到该事件。</li>
+<li>ACTION_UP：用户手指离开屏幕，表示一次触摸事件的
     
     <a class="article-more-a" href="/2019/07/01/Android触摸事件传递机制/#more">more >></a>
     
